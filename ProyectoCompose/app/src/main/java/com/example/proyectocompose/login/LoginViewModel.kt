@@ -2,14 +2,15 @@ package com.example.proyectocompose.login
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.proyectocompose.Colecciones
 import com.example.proyectocompose.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -17,8 +18,8 @@ import kotlinx.coroutines.flow.StateFlow
 class LoginViewModel: ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val TAG = "Alejandro"
-
+    private val db = Firebase.firestore
+    val TAG = "AMIGOSAPP"
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> get()=_isLoading
 
@@ -46,8 +47,9 @@ class LoginViewModel: ViewModel() {
             .addOnCompleteListener { task ->
                 _isLoading.value = false
                 if (task.isSuccessful) {
-                    _loginSuccess.value = true
+                    //_loginSuccess.value = true
                     _currentEmail.value = auth.currentUser?.email!!
+                    checkForm()
                 } else {
                     //_errorMessage.value = task.exception?.message ?: "Error desconocido"
                 }
@@ -61,10 +63,9 @@ class LoginViewModel: ViewModel() {
 
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                _isLoading.value = false
                 if (task.isSuccessful) {
-                    _registerSuccess.value = true
                     _currentEmail.value = auth.currentUser?.email!!
+                    createBasicUser()
                 } else {
                     //errorMessage.value = task.exception?.message ?: "Error desconocido"
                 }
@@ -79,15 +80,13 @@ class LoginViewModel: ViewModel() {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
-                _isLoading.value = false
                 if (task.isSuccessful) {
-
                     val newUser = task.result?.additionalUserInfo?.isNewUser ?: false
                     _currentEmail.value = auth.currentUser?.email!!
                     if (newUser) {
-                        _registerSuccess.value = true
+                        createBasicUser()
                     } else {
-                        _loginSuccess.value = true
+                        checkForm()
                     }
 
 
@@ -128,6 +127,53 @@ class LoginViewModel: ViewModel() {
 
     fun getCurrentEmail(): String{
         return auth.currentUser?.email ?:""
+    }
+
+    private fun createBasicUser(){
+        val user = hashMapOf(
+            "correo" to _currentEmail.value,
+            "formCompletado" to false
+        )
+
+        db.collection(Colecciones.usuarios)
+            .document(_currentEmail.value)
+            .set(user)
+            .addOnSuccessListener {
+                Log.e(TAG,"USUARIO CREADO")
+                _registerSuccess.value = true
+                _isLoading.value = false
+            }
+            .addOnFailureListener {
+                Log.e(TAG,"ERROR AL CREAR EL USUARIO")
+            }
+    }
+
+    private fun checkForm(){
+
+        var form:Boolean
+
+        db.collection(Colecciones.usuarios)
+            .document(currentEmail.value)
+            .get()
+            .addOnSuccessListener { result ->
+                val datos = result.data
+                datos?.let {
+                    form = datos["formCompletado"] as Boolean
+                    Log.e(TAG,"FORM COMPLETADO: "+form)
+                    if (form){
+                        _loginSuccess.value = true
+                    }
+                    else{
+                        _registerSuccess.value = true
+                    }
+                }
+                _isLoading.value = false
+
+            }
+            .addOnFailureListener {
+                Log.e(TAG,"ERROR AL OBTENER EL USUARIO")
+            }
+
     }
 
 

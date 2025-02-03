@@ -3,6 +3,6 @@ package com.example.proyectocompose
 object Rutas {
     val login = "Login"
     val registro = "Registro"
-    val dashboard = "Dashboard"
+    val dashboard = "DashboardPrueba"
     val formulario = "Formulario"
 }

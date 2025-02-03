@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectocompose.dashboard.DashboardPrueba
 import com.example.proyectocompose.login.Formulario
 import com.example.proyectocompose.login.Login
 import com.example.proyectocompose.login.LoginViewModel
@@ -37,6 +38,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Rutas.formulario) {
                         Formulario(navController = navController,loginViewModel= loginViewModel)
+                    }
+                    composable(Rutas.dashboard){
+                        DashboardPrueba()
                     }
                 }
             }

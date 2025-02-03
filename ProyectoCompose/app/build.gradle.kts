@@ -64,5 +64,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.coil.compose)
     implementation(libs.play.services.auth)
+    //implementation (libs.androidx.foundation.pager)
 
 }

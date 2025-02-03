@@ -1,8 +1,8 @@
 package com.example.proyectocompose.login
 
 import android.app.DatePickerDialog
+import android.util.Log
 import android.widget.DatePicker
-import android.widget.Space
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -21,14 +22,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -37,16 +40,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectocompose.R
+import com.example.proyectocompose.Rutas
 import com.example.proyectocompose.common.BodyText
 import com.example.proyectocompose.common.ClickableText
 import com.example.proyectocompose.common.Subtitle
-import com.example.proyectocompose.common.TFBasic
 import java.util.Calendar
 import java.util.Date
 
@@ -54,17 +58,23 @@ import java.util.Date
 fun Formulario(navController: NavController, loginViewModel: LoginViewModel) {
 
     val viewModel = remember { FormularioViewModel() }
-    val email by loginViewModel.currentEmail.collectAsState()
     var page by remember { mutableIntStateOf(1) }
+    val registroCompletado by viewModel.completado.collectAsState()
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         when (page) {
             1 -> Info(viewModel) { page = 2 }
-            2 -> Datos(viewModel, back = { page = 1 }) { page = 3 }
-            3 -> Preferencias(viewModel, back = { page = 2 })
+            2 -> DatosPreferencias(viewModel, back = { page = 1 })
             {
-
+                viewModel.correo.value = loginViewModel.currentEmail.value
+                viewModel.completarRegistro()
             }
         }
+    }
+    if(registroCompletado){
+        navController.navigate(Rutas.dashboard) {
+            popUpTo(Rutas.login) { inclusive = true }
+        }
+        viewModel.setRegistroCompletado(false)
     }
 
 }
@@ -130,58 +140,10 @@ fun Info(viewModel: FormularioViewModel, next: () -> Unit) {
 }
 
 @Composable
-fun Datos(viewModel: FormularioViewModel, back: () -> Unit, next: () -> Unit) {
-
+fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: () -> Unit) {
     val nombre by viewModel.nombre.collectAsState()
     val apellidos by viewModel.apellidos.collectAsState()
     val fecNac by viewModel.fecNac.collectAsState()
-
-    // TODO(AÑADIR IMAGEN PERFIL)
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 70.dp, horizontal = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally){
-                Text(text="Datos Personales", fontSize = 40.sp, lineHeight = 40.sp)
-                Spacer(modifier=Modifier.padding(bottom=20.dp))
-            }
-
-            TextField(value =nombre, onValueChange = {viewModel.nombre.value = it}, placeholder = { Text(text="Nombre: ")})
-            Spacer(modifier = Modifier.height(30.dp))
-            TextField(value =apellidos, onValueChange = {viewModel.apellidos.value = it}, placeholder = { Text(text="Apellidos: ")})
-            Spacer(modifier = Modifier.height(10.dp))
-
-            DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom
-        ) {
-            Button(onClick = back) {
-                Text("Atrás")
-            }
-            Button(onClick = next) {
-                Text("Siguiente")
-            }
-        }
-    }
-}
-
-@Composable
-fun Preferencias(viewModel: FormularioViewModel, back: () -> Unit, next: () -> Unit) {
     val relacionSeria by viewModel.relacionSeria.collectAsState()
     val deportes by viewModel.deportes.collectAsState()
     val arte by viewModel.arte.collectAsState()
@@ -189,6 +151,11 @@ fun Preferencias(viewModel: FormularioViewModel, back: () -> Unit, next: () -> U
     val tieneHijos by viewModel.tieneHijos.collectAsState()
     val quiereHijos by viewModel.quiereHijos.collectAsState()
     val interesSexual by viewModel.interesSexual.collectAsState()
+    var btnEnabled by remember {
+        mutableStateOf(false)
+    }
+    btnEnabled = nombre.trim().isNotEmpty()  && apellidos.trim().isNotEmpty() && fecNac.isNotEmpty() && interesSexual.trim().isNotEmpty()
+    // TODO(AÑADIR IMAGEN PERFIL)
 
     Column(
         modifier = Modifier
@@ -197,56 +164,101 @@ fun Preferencias(viewModel: FormularioViewModel, back: () -> Unit, next: () -> U
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally){
-                Text(text="Preferencias", fontSize = 40.sp, lineHeight = 40.sp)
-                Spacer(modifier=Modifier.padding(bottom=20.dp))
+            item{
+                Column(horizontalAlignment = Alignment.CenterHorizontally){
+                    Text(text="Datos Personales", fontSize = 30.sp, lineHeight = 35.sp)
+                    Spacer(modifier=Modifier.padding(bottom=20.dp))
+                    HorizontalDivider()
+                }
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Relación seria:",
-                    modifier = Modifier
-                        .weight(0.5f)
-                        .padding(end = 10.dp)
-                )
-                Switch(
-                    checked = relacionSeria,
-                    onCheckedChange = { viewModel.relacionSeria.value = it },
-                    modifier = Modifier.weight(0.5f)
-                )
+            item{
+                TextField(value =nombre, onValueChange = {viewModel.nombre.value = it}, placeholder = { Text(text="Nombre: ")})
+                Spacer(modifier = Modifier.height(30.dp))
             }
-            Spacer(modifier = Modifier.height(15.dp))
-
-            SliderPreference(
-                title = "Deportes",
-                value = deportes,
-                onValueChange = { viewModel.deportes.value = it })
-            Spacer(modifier = Modifier.height(15.dp))
-            SliderPreference(
-                title = "Arte",
-                value = arte,
-                onValueChange = { viewModel.arte.value = it })
-            Spacer(modifier = Modifier.height(15.dp))
-            SliderPreference(
-                title = "Política",
-                value = politica,
-                onValueChange = { viewModel.politica.value = it })
-            Spacer(modifier = Modifier.height(15.dp))
-            Row(verticalAlignment = Alignment.CenterVertically){
-                Text("Interés en: ", modifier = Modifier.padding(end=10.dp))
-                ComboBox { viewModel.interesSexual.value = it }
+            item{
+                TextField(value =apellidos, onValueChange = {viewModel.apellidos.value = it}, placeholder = { Text(text="Apellidos: ")})
+                Spacer(modifier = Modifier.height(10.dp))
             }
+            item{
+                DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+            item{
+                Column(horizontalAlignment = Alignment.CenterHorizontally){
+                    Text(text="Preferencias:", fontSize = 30.sp, lineHeight = 35.sp)
+                    Spacer(modifier=Modifier.padding(bottom=20.dp))
+                    HorizontalDivider()
+                }
+            }
+            item{
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Relación seria:",
+                        modifier = Modifier
+                            .weight(0.5f)
+                            .padding(end = 10.dp)
+                    )
+                    Switch(
+                        checked = relacionSeria,
+                        onCheckedChange = { viewModel.relacionSeria.value = it },
+                        modifier = Modifier.weight(0.5f)
+                    )
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+            }
+            item{
+                SliderPreference(
+                    title = "deportes",
+                    value = deportes,
+                    onValueChange = { viewModel.deportes.value = it })
+                Spacer(modifier = Modifier.height(25.dp))
+            }
+            item{
+                SliderPreference(
+                    title = "arte",
+                    value = arte,
+                    onValueChange = { viewModel.arte.value = it })
+                Spacer(modifier = Modifier.height(25.dp))
+            }
+            item{
+                SliderPreference(
+                    title = "política",
+                    value = politica,
+                    onValueChange = { viewModel.politica.value = it })
+                Spacer(modifier = Modifier.height(25.dp))
+            }
+            item{
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Text("¿Tienes hijos?: ", modifier = Modifier.padding(end=10.dp))
+                    ComboBox (listOf("No","Si")) { viewModel.tieneHijos.value = it as Boolean }
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+            }
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Text("¿Quieres tener hijos?: ", modifier = Modifier.padding(end=10.dp))
+                    ComboBox (listOf("No","Si")) { viewModel.quiereHijos.value = it as Boolean }
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+            }
+            item{
+                Row(verticalAlignment = Alignment.CenterVertically){
+                    Text("Interesado en: ", modifier = Modifier.padding(end=10.dp))
+                    ComboBox (listOf("","Mujer","Hombre","Ambos")) { viewModel.interesSexual.value = it as String }
+                }
 
-            Spacer(modifier = Modifier.height(35.dp))
+                Spacer(modifier = Modifier.height(35.dp))
+            }
         }
 
         Row(
@@ -256,41 +268,59 @@ fun Preferencias(viewModel: FormularioViewModel, back: () -> Unit, next: () -> U
             Button(onClick = back) {
                 Text("Atrás")
             }
-            Button(onClick = next) {
+            Button(onClick = next, enabled = btnEnabled) {
                 Text("Finalizar")
             }
         }
     }
+
+
+
 }
 
 @Composable
 fun SliderPreference(title: String, value: Int, onValueChange: (Int) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "$title: $value",
-            modifier = Modifier
-                .weight(0.5f)
-                .padding(end = 10.dp)
+            text = "Interés en $title:",
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-        Slider(
-            value = value.toFloat(),
-            onValueChange = { onValueChange(it.toInt()) },
-            valueRange = 0f..100f,
-            steps = 99,
-            modifier = Modifier.weight(0.5f)
-        )
+
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            Slider(
+                value = value.toFloat(),
+                onValueChange = { onValueChange(it.toInt()) },
+                valueRange = 0f..100f,
+                steps = 99,
+                modifier = Modifier.weight(1f),
+                colors = SliderDefaults.colors(
+                    activeTickColor = Color.Transparent,
+                    inactiveTickColor = Color.Transparent
+                )
+            )
+
+            Text(
+                text = value.toString(),
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComboBox(onSexoSelected: (String) -> Unit) {
+fun ComboBox(opciones: List<String>,onOptionSelected: (Any) -> Unit) {
 
-    val options = listOf("Hombre", "Mujer", "Ambos")
-    var selectedOption by remember { mutableStateOf(options[0]) }
+    var selectedOption by remember { mutableStateOf(opciones.first()) }
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -303,19 +333,26 @@ fun ComboBox(onSexoSelected: (String) -> Unit) {
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { TrailingIcon(expanded = isExpanded) },
-                modifier = Modifier.menuAnchor(),
+                modifier = Modifier.menuAnchor().width(150.dp).height(50.dp)
+
             )
 
             ExposedDropdownMenu(
                 expanded = isExpanded,
                 onDismissRequest = { isExpanded = false }
             ) {
-                options.forEach { option ->
+                opciones.forEach { option ->
                     DropdownMenuItem(
                         text = { Text(text = option) },
                         onClick = {
                             selectedOption = option
-                            onSexoSelected(option)
+                            when(selectedOption){
+                                "No" ->onOptionSelected(false)
+                                "Si" -> onOptionSelected(true)
+                                "" -> ""
+                                else -> onOptionSelected(selectedOption)
+                            }
+
                             isExpanded = false
                         },
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
@@ -401,3 +438,5 @@ fun Terminos(
         }
     )
 }
+
+
