@@ -11,37 +11,36 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.proyectocompose.login.Formulario
+import com.example.proyectocompose.login.Login
+import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.ui.theme.ProyectoComposeTheme
+import kotlin.math.log
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val loginViewModel = LoginViewModel()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ProyectoComposeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+
+                NavHost(navController, startDestination = Rutas.login){
+                    composable(Rutas.login) {
+                        Login(navController = navController, loginViewModel = loginViewModel)
+                    }
+                    composable(Rutas.formulario) {
+                        Formulario(navController = navController,loginViewModel= loginViewModel)
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ProyectoComposeTheme {
-        Greeting("Android")
-    }
-}

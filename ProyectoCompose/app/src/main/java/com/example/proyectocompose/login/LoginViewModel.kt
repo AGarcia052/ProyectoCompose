@@ -1,0 +1,134 @@
+package com.example.proyectocompose.login
+
+import android.content.Context
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.example.proyectocompose.R
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+
+class LoginViewModel: ViewModel() {
+
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val TAG = "Alejandro"
+
+    private val _isLoading = MutableStateFlow<Boolean>(false)
+    val isLoading: StateFlow<Boolean> get()=_isLoading
+
+    private val _loginSuccess = MutableStateFlow<Boolean>(false)
+    val loginSuccess: StateFlow<Boolean> get()=_loginSuccess
+
+    private val _registerSuccess = MutableStateFlow<Boolean>(false)
+    val registerSuccess: StateFlow<Boolean> get()=_registerSuccess
+
+    private val _currentEmail = MutableStateFlow<String>("")
+    val currentEmail: StateFlow<String> get()=_currentEmail
+
+    //val errorMessage = MutableStateFlow<String?>(null)
+
+
+    val isUserLoggedIn: Boolean
+        get() = auth.currentUser != null
+
+    fun loginWithEmail(email: String, password: String) {
+        _isLoading.value = true
+       // errorMessage.value = null
+        _loginSuccess.value = false
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                _isLoading.value = false
+                if (task.isSuccessful) {
+                    _loginSuccess.value = true
+                    _currentEmail.value = auth.currentUser?.email!!
+                } else {
+                    //_errorMessage.value = task.exception?.message ?: "Error desconocido"
+                }
+            }
+    }
+
+    fun registerWithEmail(email: String, password: String) {
+        _isLoading.value = true
+        //errorMessage.value = null
+        _registerSuccess.value = false
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                _isLoading.value = false
+                if (task.isSuccessful) {
+                    _registerSuccess.value = true
+                    _currentEmail.value = auth.currentUser?.email!!
+                } else {
+                    //errorMessage.value = task.exception?.message ?: "Error desconocido"
+                }
+            }
+    }
+
+    fun loginWithGoogle(idToken: String) {
+        _isLoading.value = true
+        _loginSuccess.value = false
+        _registerSuccess.value = false
+
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                _isLoading.value = false
+                if (task.isSuccessful) {
+
+                    val newUser = task.result?.additionalUserInfo?.isNewUser ?: false
+                    _currentEmail.value = auth.currentUser?.email!!
+                    if (newUser) {
+                        _registerSuccess.value = true
+                    } else {
+                        _loginSuccess.value = true
+                    }
+
+
+
+                } else {
+                    //errorMessage.value = task.exception?.message ?: "Error desconocido"
+                }
+            }
+    }
+
+    fun signOut(context: Context) {
+        Log.d(TAG, "signOut() llamado ${_loginSuccess.value}")
+        if (_loginSuccess.value) {
+            val googleSignInClient = GoogleSignIn.getClient(
+                context,
+                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(context.getString(R.string.client_id))
+                    .requestEmail()
+                    .build()
+            )
+
+            googleSignInClient.revokeAccess().addOnCompleteListener { revokeTask ->
+                if (revokeTask.isSuccessful) {
+                    Log.d(TAG, "Acceso revocado correctamente")
+                    auth.signOut()
+                    Log.d(TAG, "Sesión cerrada correctamente")
+                } else {
+                    Log.e(TAG, "Error al revocar el acceso")
+                }
+            }
+        } else {
+            auth.signOut()
+            Log.d(TAG, "Sesión cerrada para usuario no Google")
+        }
+
+        _loginSuccess.value = false
+    }
+
+    fun getCurrentEmail(): String{
+        return auth.currentUser?.email ?:""
+    }
+
+
+}
