@@ -21,7 +21,7 @@ class FormularioViewModel: ViewModel(){
     val politica = MutableStateFlow(50)
     val tieneHijos = MutableStateFlow(false)
     val quiereHijos = MutableStateFlow(false)
-    val interesSexual = MutableStateFlow<List<String>>(listOf())
+    val interesSexual = MutableStateFlow("")
 
     private val _formulario = MutableStateFlow<Form>(Form())
     val formulario: StateFlow<Form> get() = _formulario

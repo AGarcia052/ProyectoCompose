@@ -156,12 +156,22 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
             Spacer(modifier = Modifier.height(25.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isRegistering){
 
-                BodyText(text = "¿Aún no tienes cuenta?")
+                    BodyText(text = "¿Ya tienes cuenta?")
 
-                Spacer(modifier = Modifier.width(5.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
 
-                ClickableText(text = "Registrate") { isRegistering = true }
+                    ClickableText(text = "Iniciar sesión") { isRegistering = !isRegistering }
+                }
+                else{
+                    BodyText(text = "¿Aún no tienes cuenta?")
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    ClickableText(text = "Registrate") { isRegistering = !isRegistering }
+                }
+
             }
 
 

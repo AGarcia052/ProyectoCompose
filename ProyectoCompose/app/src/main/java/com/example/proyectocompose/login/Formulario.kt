@@ -2,6 +2,7 @@ package com.example.proyectocompose.login
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
+import android.widget.Space
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,9 +16,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectocompose.R
 import com.example.proyectocompose.common.BodyText
@@ -66,7 +77,7 @@ fun Info(viewModel: FormularioViewModel, next: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(vertical = 70.dp, horizontal = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
@@ -74,19 +85,20 @@ fun Info(viewModel: FormularioViewModel, next: () -> Unit) {
                 .weight(1f)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Spacer(modifier = Modifier.height(20.dp))
             Subtitle(text = "¡Bienvenido a la Aplicación!")
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
             BodyText(
                 text = "A continuación, tendrás que completar la creación de tu cuenta" +
                         " y rellenar un formulario con tus intereses para recomendarte usuarios con gustos parecidos a los tuyos"
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             BodyText(text = "Para continuar, acepte los términos y condiciones de la aplicación.")
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = checked, onCheckedChange = { viewModel.terms.value = !checked })
@@ -131,37 +143,32 @@ fun Datos(viewModel: FormularioViewModel, back: () -> Unit, next: () -> Unit) {
             .fillMaxSize()
             .padding(vertical = 70.dp, horizontal = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+    ) {
 
         Column(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TFBasic(
-                value = nombre,
-                label = "Nombre: "
-            ) {
-                viewModel.nombre.value = it
-            }
-            Spacer(modifier = Modifier.height(30.dp))
 
-            TFBasic(
-                value = apellidos,
-                label = "Apellidos: "
-            ) {
-                viewModel.apellidos.value = it
+            Column(horizontalAlignment = Alignment.CenterHorizontally){
+                Text(text="Datos Personales", fontSize = 40.sp, lineHeight = 40.sp)
+                Spacer(modifier=Modifier.padding(bottom=20.dp))
             }
+
+            TextField(value =nombre, onValueChange = {viewModel.nombre.value = it}, placeholder = { Text(text="Nombre: ")})
+            Spacer(modifier = Modifier.height(30.dp))
+            TextField(value =apellidos, onValueChange = {viewModel.apellidos.value = it}, placeholder = { Text(text="Apellidos: ")})
             Spacer(modifier = Modifier.height(10.dp))
 
-            DatePickerEdad { viewModel.fecNac.value = it }
+            DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
         }
 
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom
         ) {
             Button(onClick = back) {
                 Text("Atrás")
@@ -175,30 +182,156 @@ fun Datos(viewModel: FormularioViewModel, back: () -> Unit, next: () -> Unit) {
 
 @Composable
 fun Preferencias(viewModel: FormularioViewModel, back: () -> Unit, next: () -> Unit) {
+    val relacionSeria by viewModel.relacionSeria.collectAsState()
+    val deportes by viewModel.deportes.collectAsState()
+    val arte by viewModel.arte.collectAsState()
+    val politica by viewModel.politica.collectAsState()
+    val tieneHijos by viewModel.tieneHijos.collectAsState()
+    val quiereHijos by viewModel.quiereHijos.collectAsState()
+    val interesSexual by viewModel.interesSexual.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(vertical = 70.dp, horizontal = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally){
+                Text(text="Preferencias", fontSize = 40.sp, lineHeight = 40.sp)
+                Spacer(modifier=Modifier.padding(bottom=20.dp))
+            }
 
-        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceEvenly) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Relación seria:",
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .padding(end = 10.dp)
+                )
+                Switch(
+                    checked = relacionSeria,
+                    onCheckedChange = { viewModel.relacionSeria.value = it },
+                    modifier = Modifier.weight(0.5f)
+                )
+            }
+            Spacer(modifier = Modifier.height(15.dp))
+
+            SliderPreference(
+                title = "Deportes",
+                value = deportes,
+                onValueChange = { viewModel.deportes.value = it })
+            Spacer(modifier = Modifier.height(15.dp))
+            SliderPreference(
+                title = "Arte",
+                value = arte,
+                onValueChange = { viewModel.arte.value = it })
+            Spacer(modifier = Modifier.height(15.dp))
+            SliderPreference(
+                title = "Política",
+                value = politica,
+                onValueChange = { viewModel.politica.value = it })
+            Spacer(modifier = Modifier.height(15.dp))
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Text("Interés en: ", modifier = Modifier.padding(end=10.dp))
+                ComboBox { viewModel.interesSexual.value = it }
+            }
+
+            Spacer(modifier = Modifier.height(35.dp))
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Button(onClick = back) {
                 Text("Atrás")
             }
             Button(onClick = next) {
-                Text("Siguiente")
+                Text("Finalizar")
             }
         }
     }
 }
 
 @Composable
-fun DatePickerEdad(onDateSelected: (String) -> Unit) {
+fun SliderPreference(title: String, value: Int, onValueChange: (Int) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "$title: $value",
+            modifier = Modifier
+                .weight(0.5f)
+                .padding(end = 10.dp)
+        )
+        Slider(
+            value = value.toFloat(),
+            onValueChange = { onValueChange(it.toInt()) },
+            valueRange = 0f..100f,
+            steps = 99,
+            modifier = Modifier.weight(0.5f)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ComboBox(onSexoSelected: (String) -> Unit) {
+
+    val options = listOf("Hombre", "Mujer", "Ambos")
+    var selectedOption by remember { mutableStateOf(options[0]) }
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        ExposedDropdownMenuBox(
+            expanded = isExpanded,
+            onExpandedChange = { isExpanded = it }
+        ) {
+            TextField(
+                value = selectedOption,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { TrailingIcon(expanded = isExpanded) },
+                modifier = Modifier.menuAnchor(),
+            )
+
+            ExposedDropdownMenu(
+                expanded = isExpanded,
+                onDismissRequest = { isExpanded = false }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(text = option) },
+                        onClick = {
+                            selectedOption = option
+                            onSexoSelected(option)
+                            isExpanded = false
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DatePickerEdad(fechaElegida: String, onDateSelected: (String) -> Unit) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-    var fechaSelecc by remember { mutableStateOf("") }
+    var fechaSelecc by remember { mutableStateOf(fechaElegida) }
 
     calendar.add(Calendar.YEAR, -18)
     val fecMinima = calendar.timeInMillis
