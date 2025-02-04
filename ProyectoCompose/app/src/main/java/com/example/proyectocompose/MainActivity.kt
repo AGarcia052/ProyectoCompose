@@ -2,6 +2,7 @@ package com.example.proyectocompose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,37 +12,53 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.proyectocompose.administrador.listaUsuarios.EditarUsuario
+import com.example.proyectocompose.administrador.listaUsuarios.ListaUsuarios
+import com.example.proyectocompose.administrador.listaUsuarios.ListaUsuariosViewModel
+import com.example.proyectocompose.administrador.principal.AdminPrincipal
+import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.ui.theme.ProyectoComposeTheme
+import com.example.proyectocompose.usuario.dashboard.Dashboard
+import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val loginViewModel = LoginViewModel()
+        val dashboardViewModel = DashboardViewModel()
+        val listaUsuariosViewModel = ListaUsuariosViewModel()
+
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // No hacer nada (bloquea el retroceso)
+            }
+        })
         enableEdgeToEdge()
         setContent {
             ProyectoComposeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+
+                NavHost(navController, startDestination = Rutas.login){
+                    composable(Rutas.dashboard) {
+                        Dashboard(navController, loginViewModel, dashboardViewModel)
+                    }
+                    composable(Rutas.adminPrincipal) {
+                        AdminPrincipal(navController)
+                    }
+                    composable(Rutas.usuariosAdmin) {
+                        ListaUsuarios(navController, loginViewModel, listaUsuariosViewModel)
+                    }
+                    composable(Rutas.editarUsuario){
+                        EditarUsuario(navController, listaUsuariosViewModel)
+                    }
                 }
             }
         }
     }
+
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ProyectoComposeTheme {
-        Greeting("Android")
-    }
-}
