@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                         Dashboard(navController, loginViewModel, dashboardViewModel)
                     }
                     composable(Rutas.adminPrincipal) {
-                        AdminPrincipal(navController)
+                        AdminPrincipal(navController, loginViewModel)
                     }
                     composable(Rutas.usuariosAdmin) {
                         ListaUsuarios(navController, loginViewModel, listaUsuariosViewModel)

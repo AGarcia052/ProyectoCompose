@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -39,7 +40,7 @@ import com.example.proyectocompose.model.User
 fun ListaUsuarios(navController: NavController, loginViewModel: LoginViewModel, listaUsuariosViewModel: ListaUsuariosViewModel){
     Scaffold(
         topBar = {
-            TopBarListaUsuarios(navController)
+            TopBarListaUsuarios(navController, listaUsuariosViewModel)
         }) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
@@ -52,7 +53,7 @@ fun ListaUsuarios(navController: NavController, loginViewModel: LoginViewModel, 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarListaUsuarios(navController: NavController){
+fun TopBarListaUsuarios(navController: NavController, listaUsuariosViewModel: ListaUsuariosViewModel){
     TopAppBar(
         colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -69,6 +70,19 @@ fun TopBarListaUsuarios(navController: NavController){
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Localized description"
+                )
+            }
+        },
+        actions =
+        {
+            IconButton(
+                onClick = {
+                    listaUsuariosViewModel.cargarUsuarios()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
                     contentDescription = "Localized description"
                 )
             }

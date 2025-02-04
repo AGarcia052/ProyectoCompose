@@ -2,6 +2,7 @@ package com.example.proyectocompose.administrador.listaUsuarios
 
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,6 +30,8 @@ class ListaUsuariosViewModel:ViewModel() {
 
     fun seleccionarUsuario(usuario: User){
         _usuarioAEditar.value = usuario
+        _rol.value = usuario.rol
+        _activo.value = usuario.activado
     }
     fun desseleccionarUsuario(){
         _usuarioAEditar.value = null
@@ -52,8 +55,9 @@ class ListaUsuariosViewModel:ViewModel() {
     val imageUri: StateFlow<Uri> get() = _imageUri
 
     fun cargarImagen(email: String) {
-        storageRef.child("images/$email/perfil.jpg").downloadUrl()
+        storageRef.child("images/$email/perfil").downloadUrl
             .addOnSuccessListener { uri ->
+                Log.e(TAG, uri.toString())
                 _imageUri.value = uri
             }
             .addOnFailureListener { exception ->

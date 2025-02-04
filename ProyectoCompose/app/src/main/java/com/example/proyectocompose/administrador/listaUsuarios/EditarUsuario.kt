@@ -124,6 +124,7 @@ fun BodyEditarUsuario(navController: NavController, listaUsuariosViewModel: List
                     listaUsuariosViewModel.cambiarRolUsuario(listaUsuariosViewModel.rol.value)
                 }
                 listaUsuariosViewModel.desseleccionarUsuario()
+                listaUsuariosViewModel.cargarUsuarios()
                 navController.popBackStack(Rutas.usuariosAdmin, inclusive = false)
             }) {
                 Text(text = "Aceptar Cambios")
