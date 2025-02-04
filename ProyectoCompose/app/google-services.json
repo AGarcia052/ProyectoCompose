@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "855813660182",
+    "firebase_url": "https://grupocompose-fec11-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "grupocompose-fec11",
+    "storage_bucket": "grupocompose-fec11.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855813660182:android:2ff4002b7735c5c9d6df37",
+        "android_client_info": {
+          "package_name": "com.example.proyectocompose"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "855813660182-gre7bei6gnm42fkf71na9ojog5o9k2iu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.proyectocompose",
+            "certificate_hash": "9c6644f69690b63ef0f71f6dc26d249ce597314e"
+          }
+        },
+        {
+          "client_id": "855813660182-mglpihs22oo0720h9qqsp2t0lqp9bv1s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-I6KRiB4AYRq61Nb6TjPMxWcD0lx9fy4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "855813660182-mglpihs22oo0720h9qqsp2t0lqp9bv1s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
