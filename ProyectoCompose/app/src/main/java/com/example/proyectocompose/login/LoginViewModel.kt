@@ -10,9 +10,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+
 
 
 class LoginViewModel: ViewModel() {
@@ -209,8 +211,5 @@ class LoginViewModel: ViewModel() {
         _loginSuccess.value = false
         _registerSuccess.value = false
     }
-
-
-
 
 }
