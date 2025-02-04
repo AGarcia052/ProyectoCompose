@@ -49,6 +49,7 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
     val registerSuccess by loginViewModel.registerSuccess.collectAsState()
     val loading by loginViewModel.isLoading.collectAsState()
     var isRegistering by remember { mutableStateOf(false) }
+    val activo by loginViewModel.userActivo.collectAsState()
 
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -76,8 +77,10 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
     }
 
     LaunchedEffect(loginSuccess) {
+        val destino = if(activo) Rutas.dashboard else Rutas.usrNoActivo
         if (loginSuccess) {
-            navController.navigate(Rutas.dashboard) {
+            loginViewModel.restart()
+            navController.navigate(destino) {
                 popUpTo(Rutas.login) { inclusive = true }
             }
         }
@@ -85,6 +88,7 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
 
     LaunchedEffect(registerSuccess) {
         if (registerSuccess) {
+            loginViewModel.restart()
             navController.navigate(Rutas.formulario) {
                 popUpTo(Rutas.formulario) { inclusive = true }
             }
@@ -115,11 +119,17 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
 
             Button(
                 onClick = {
-                    if (isRegistering) {
-                        loginViewModel.registerWithEmail(email, passwd)
-                    } else {
-                        loginViewModel.loginWithEmail(email, passwd)
+                    if (email.isEmpty() || passwd.isEmpty()){
+                        Toast.makeText(context,"Completa todos los campos para continuar",Toast.LENGTH_SHORT).show()
                     }
+                    else{
+                        if (isRegistering) {
+                            loginViewModel.registerWithEmail(email, passwd)
+                        } else {
+                            loginViewModel.loginWithEmail(email, passwd)
+                        }
+                    }
+
                 },
                 elevation = ButtonDefaults.elevatedButtonElevation(),
                 modifier = Modifier.width(300.dp)
@@ -136,7 +146,12 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
 
             Button(
                 onClick = {
-                    launchGoogleSignIn()
+                    if (email.isEmpty() || passwd.isEmpty()){
+                        Toast.makeText(context,"Completa todos los campos para continuar",Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        launchGoogleSignIn()
+                    }
                 },
                 elevation = ButtonDefaults.elevatedButtonElevation(),
                 modifier = Modifier.width(300.dp)
@@ -183,4 +198,23 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
 
     }
 
+}
+
+//TODO(CAMBIAR POR TOAST)
+@Composable
+fun UsuarioNoActivo(navController: NavController){
+    Column (verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(modifier = Modifier.height(100.dp))
+        Text(text = "TU USARIO NO HA SIDO ACTIVADO.\nContacta con un administrador para activar tu cuenta")
+        Spacer(modifier = Modifier.height(100.dp))
+        Button(onClick = {
+
+            navController.navigate(Rutas.login){
+                popUpTo(Rutas.login) { inclusive = true }
+            }
+
+        }) {
+            Text(text="Volver")
+        }
+    }
 }

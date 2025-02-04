@@ -32,6 +32,9 @@ class LoginViewModel: ViewModel() {
     private val _currentEmail = MutableStateFlow<String>("")
     val currentEmail: StateFlow<String> get()=_currentEmail
 
+    private val _userActivo = MutableStateFlow<Boolean>(true)
+    val userActivo: StateFlow<Boolean> get()=_userActivo
+
     //val errorMessage = MutableStateFlow<String?>(null)
 
 
@@ -151,7 +154,7 @@ class LoginViewModel: ViewModel() {
     private fun checkForm(){
 
         var form:Boolean
-
+        var activo:Boolean
         db.collection(Colecciones.usuarios)
             .document(currentEmail.value)
             .get()
@@ -159,8 +162,12 @@ class LoginViewModel: ViewModel() {
                 val datos = result.data
                 datos?.let {
                     form = datos["formCompletado"] as Boolean
+                    activo = datos["activo"] as Boolean
                     Log.e(TAG,"FORM COMPLETADO: "+form)
                     if (form){
+                        if(!activo){
+                            _userActivo.value = false
+                        }
                         _loginSuccess.value = true
                     }
                     else{
@@ -175,6 +182,14 @@ class LoginViewModel: ViewModel() {
             }
 
     }
+
+    fun restart(){
+        _loginSuccess.value = false
+        _registerSuccess.value = false
+        _userActivo.value = false
+    }
+
+
 
 
 }

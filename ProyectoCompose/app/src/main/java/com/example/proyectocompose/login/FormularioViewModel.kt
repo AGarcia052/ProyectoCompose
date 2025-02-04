@@ -51,6 +51,8 @@ class FormularioViewModel: ViewModel(){
             "fecNac" to fecNac.value,
             "correo" to correo.value,
             "formCompletado" to true,
+            "rol" to "USUARIO",
+            "activo" to false,
             "formulario" to form
         )
 

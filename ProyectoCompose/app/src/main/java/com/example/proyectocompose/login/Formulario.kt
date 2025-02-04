@@ -71,7 +71,7 @@ fun Formulario(navController: NavController, loginViewModel: LoginViewModel) {
         }
     }
     if(registroCompletado){
-        navController.navigate(Rutas.dashboard) {
+        navController.navigate(Rutas.usrNoActivo) {
             popUpTo(Rutas.login) { inclusive = true }
         }
         viewModel.setRegistroCompletado(false)
@@ -148,8 +148,6 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
     val deportes by viewModel.deportes.collectAsState()
     val arte by viewModel.arte.collectAsState()
     val politica by viewModel.politica.collectAsState()
-    val tieneHijos by viewModel.tieneHijos.collectAsState()
-    val quiereHijos by viewModel.quiereHijos.collectAsState()
     val interesSexual by viewModel.interesSexual.collectAsState()
     var btnEnabled by remember {
         mutableStateOf(false)
@@ -170,6 +168,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
             item{
                 Column(horizontalAlignment = Alignment.CenterHorizontally){
                     Text(text="Datos Personales", fontSize = 30.sp, lineHeight = 35.sp)
@@ -182,14 +181,17 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                 TextField(value =nombre, onValueChange = {viewModel.nombre.value = it}, placeholder = { Text(text="Nombre: ")})
                 Spacer(modifier = Modifier.height(30.dp))
             }
+
             item{
                 TextField(value =apellidos, onValueChange = {viewModel.apellidos.value = it}, placeholder = { Text(text="Apellidos: ")})
                 Spacer(modifier = Modifier.height(10.dp))
             }
+
             item{
                 DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
                 Spacer(modifier = Modifier.height(40.dp))
             }
+
             item{
                 Column(horizontalAlignment = Alignment.CenterHorizontally){
                     Text(text="Preferencias:", fontSize = 30.sp, lineHeight = 35.sp)
@@ -197,6 +199,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                     HorizontalDivider()
                 }
             }
+
             item{
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -216,6 +219,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                 }
                 Spacer(modifier = Modifier.height(15.dp))
             }
+
             item{
                 SliderPreference(
                     title = "deportes",
@@ -223,6 +227,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                     onValueChange = { viewModel.deportes.value = it })
                 Spacer(modifier = Modifier.height(25.dp))
             }
+
             item{
                 SliderPreference(
                     title = "arte",
@@ -230,6 +235,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                     onValueChange = { viewModel.arte.value = it })
                 Spacer(modifier = Modifier.height(25.dp))
             }
+
             item{
                 SliderPreference(
                     title = "política",
@@ -237,6 +243,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                     onValueChange = { viewModel.politica.value = it })
                 Spacer(modifier = Modifier.height(25.dp))
             }
+
             item{
                 Row(verticalAlignment = Alignment.CenterVertically){
                     Text("¿Tienes hijos?: ", modifier = Modifier.padding(end=10.dp))
@@ -244,6 +251,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                 }
                 Spacer(modifier = Modifier.height(15.dp))
             }
+
             item {
                 Row(verticalAlignment = Alignment.CenterVertically){
                     Text("¿Quieres tener hijos?: ", modifier = Modifier.padding(end=10.dp))
@@ -251,6 +259,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
                 }
                 Spacer(modifier = Modifier.height(15.dp))
             }
+
             item{
                 Row(verticalAlignment = Alignment.CenterVertically){
                     Text("Interesado en: ", modifier = Modifier.padding(end=10.dp))
@@ -259,6 +268,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
 
                 Spacer(modifier = Modifier.height(35.dp))
             }
+            
         }
 
         Row(

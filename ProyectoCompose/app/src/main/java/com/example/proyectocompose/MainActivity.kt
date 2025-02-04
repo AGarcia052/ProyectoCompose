@@ -18,6 +18,7 @@ import com.example.proyectocompose.dashboard.DashboardPrueba
 import com.example.proyectocompose.login.Formulario
 import com.example.proyectocompose.login.Login
 import com.example.proyectocompose.login.LoginViewModel
+import com.example.proyectocompose.login.UsuarioNoActivo
 import com.example.proyectocompose.ui.theme.ProyectoComposeTheme
 import kotlin.math.log
 
@@ -41,6 +42,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Rutas.dashboard){
                         DashboardPrueba()
+                    }
+                    composable(Rutas.usrNoActivo) {
+                        UsuarioNoActivo(navController)
                     }
                 }
             }

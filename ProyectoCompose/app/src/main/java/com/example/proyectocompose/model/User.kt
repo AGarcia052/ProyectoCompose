@@ -5,5 +5,6 @@ data class User(
     val nombre: String = "",
     val apellidos: String = "",
     val fecNac: String = "",
-    val formCompletado: Boolean = false
+    val formCompletado: Boolean = false,
+    val activado: Boolean = false
 )

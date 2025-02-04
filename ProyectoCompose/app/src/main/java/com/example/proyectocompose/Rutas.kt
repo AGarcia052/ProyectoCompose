@@ -5,4 +5,5 @@ object Rutas {
     val registro = "Registro"
     val dashboard = "DashboardPrueba"
     val formulario = "Formulario"
+    val usrNoActivo = "UsuarioNoActivo"
 }
