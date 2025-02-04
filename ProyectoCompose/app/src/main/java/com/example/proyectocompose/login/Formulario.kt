@@ -1,8 +1,13 @@
 package com.example.proyectocompose.login
 
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.util.Log
 import android.widget.DatePicker
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
@@ -24,6 +30,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
@@ -34,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,12 +53,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.example.proyectocompose.BuildConfig
 import com.example.proyectocompose.R
 import com.example.proyectocompose.Rutas
 import com.example.proyectocompose.common.BodyText
 import com.example.proyectocompose.common.ClickableText
 import com.example.proyectocompose.common.Subtitle
+import java.io.File
 import java.util.Calendar
 import java.util.Date
 
@@ -60,13 +72,14 @@ fun Formulario(navController: NavController, loginViewModel: LoginViewModel) {
     val viewModel = remember { FormularioViewModel() }
     var page by remember { mutableIntStateOf(1) }
     val registroCompletado by viewModel.completado.collectAsState()
+    val contexto = LocalContext.current
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         when (page) {
             1 -> Info(viewModel) { page = 2 }
             2 -> DatosPreferencias(viewModel, back = { page = 1 })
             {
                 viewModel.correo.value = loginViewModel.currentEmail.value
-                viewModel.completarRegistro()
+                viewModel.completarRegistro(context = contexto)
             }
         }
     }
@@ -142,6 +155,7 @@ fun Info(viewModel: FormularioViewModel, next: () -> Unit) {
 @Composable
 fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: () -> Unit) {
     val nombre by viewModel.nombre.collectAsState()
+    val contexto = LocalContext.current
     val apellidos by viewModel.apellidos.collectAsState()
     val fecNac by viewModel.fecNac.collectAsState()
     val relacionSeria by viewModel.relacionSeria.collectAsState()
@@ -149,11 +163,44 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
     val arte by viewModel.arte.collectAsState()
     val politica by viewModel.politica.collectAsState()
     val interesSexual by viewModel.interesSexual.collectAsState()
+    val imageUri by viewModel.imageUri.observeAsState(Uri.EMPTY)
+    val imageFile by viewModel.imageFile.observeAsState(null)
+    val uploadSuccess by viewModel.uploadSuccess.observeAsState()
     var btnEnabled by remember {
         mutableStateOf(false)
     }
     btnEnabled = nombre.trim().isNotEmpty()  && apellidos.trim().isNotEmpty() && fecNac.isNotEmpty() && interesSexual.trim().isNotEmpty()
-    // TODO(AÑADIR IMAGEN PERFIL)
+
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            imageFile?.let { file ->
+                viewModel.updateImageUri(Uri.fromFile(file))
+            }
+        } else {
+            viewModel.updateImageUri(Uri.EMPTY)
+        }
+    }
+
+
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            val file = File.createTempFile("CAM_", ".jpg", contexto.cacheDir)
+            viewModel.setImageFile(file)
+            cameraLauncher.launch(FileProvider.getUriForFile(contexto, BuildConfig.APPLICATION_ID + ".provider", file))
+        }
+    }
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            val inputStream = contexto.contentResolver.openInputStream(it)
+            val tempFile = File.createTempFile("GAL_", ".jpg", contexto.cacheDir)
+            tempFile.outputStream().use { outputStream ->
+                inputStream?.copyTo(outputStream)
+            }
+            viewModel.updateImageUri(it)
+            viewModel.setImageFile(tempFile)
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -190,6 +237,54 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
             item{
                 DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
                 Spacer(modifier = Modifier.height(40.dp))
+            }
+            item{
+                Text(text="Imagen de perfil: ", modifier = Modifier.padding(bottom=10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()){
+                    if (imageUri != Uri.EMPTY) {
+                        AsyncImage(
+                            model = imageUri,
+                            contentDescription = "Imagen perfil",
+                            modifier = Modifier
+                                .size(200.dp).border(1.dp,Color.Black)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(R.drawable.ic_no_image),
+                            contentDescription ="Imagen perfil",
+                            modifier = Modifier
+                                .size(200.dp).border(1.dp,Color.Black)
+                        )
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        IconButton(onClick = {galleryLauncher.launch("image/*")}, modifier = Modifier
+                            .padding(8.dp)
+                            .size(48.dp)) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_gallery),
+                                contentDescription = "Galeria",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        IconButton(onClick = {permissionLauncher.launch(android.Manifest.permission.CAMERA)}, modifier = Modifier
+                            .padding(8.dp)
+                            .size(48.dp)) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_camera),
+                                contentDescription = "Cámara",
+                                modifier = Modifier.size(24.dp),
+
+                                )
+                        }
+                    }
+
+                }
+
+                Spacer(modifier = Modifier.height(45.dp))
             }
 
             item{

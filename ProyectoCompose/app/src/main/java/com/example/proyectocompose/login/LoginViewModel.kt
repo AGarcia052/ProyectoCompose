@@ -155,23 +155,25 @@ class LoginViewModel: ViewModel() {
 
     private fun checkForm(){
 
-        var form:Boolean
-        var activo:Boolean
+        var formCompletado:Boolean
+        var activo:Boolean?
         db.collection(Colecciones.usuarios)
             .document(currentEmail.value)
             .get()
             .addOnSuccessListener { result ->
                 val datos = result.data
                 datos?.let {
-                    form = datos["formCompletado"] as Boolean
-                    activo = datos["activo"] as Boolean
-                    Log.e(TAG,"FORM COMPLETADO: "+form)
-                    if (form){
-                        if(!activo){
-                            _userActivo.value = false
-                        }
-                        else{
-                            cambiarConectado(true)
+                    formCompletado = datos["formCompletado"] as Boolean
+                    activo = datos["activo"] as Boolean?
+                    Log.e(TAG,"FORM COMPLETADO: "+formCompletado)
+                    if (formCompletado){
+                        if(activo != null){
+                            if(!activo!!){
+                                _userActivo.value = false
+                            }
+                            else{
+                                cambiarConectado(true)
+                            }
                         }
                         _loginSuccess.value = true
                     }
