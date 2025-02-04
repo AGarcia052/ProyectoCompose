@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,10 +45,10 @@ import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 
 
 @Composable
-fun AdminPrincipal(navController: NavController){
+fun AdminPrincipal(navController: NavController, loginViewModel: LoginViewModel){
     Scaffold(
         topBar = {
-            TopBarAdminPrincipal(navController)
+            TopBarAdminPrincipal(navController, loginViewModel)
         }) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
@@ -61,7 +62,8 @@ fun AdminPrincipal(navController: NavController){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarAdminPrincipal(navController: NavController){
+fun TopBarAdminPrincipal(navController: NavController, loginViewModel: LoginViewModel){
+    val contexto = LocalContext.current
     var mostrarMenuPuntos by remember { mutableStateOf(false) }
     val opciones = listOf("Perfil", "Volver al Dashboard", "Cerrar Sesión")
 
@@ -87,7 +89,10 @@ fun TopBarAdminPrincipal(navController: NavController){
                     when (opcion) {
                         "Perfil" -> navController.navigate(Rutas.perfil)
                         "Volver al Dashboard" -> navController.popBackStack(Rutas.dashboard, inclusive = false)
-                        "Cerrar Sesión" -> navController.popBackStack(Rutas.login, inclusive = false)
+                        "Cerrar Sesión" -> {
+                            loginViewModel.signOut(contexto)
+                            navController.navigate(Rutas.login)
+                        }
                     }
                 },
                 onDismiss = { mostrarMenuPuntos = false }
