@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.proyectocompose"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.proyectocompose"
@@ -49,6 +49,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.firebase.common.ktx)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -56,4 +59,41 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+//    implementation (platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation (platform(libs.firebase.bom))
+
+//    implementation("com.google.firebase:firebase-auth")
+    implementation(libs.firebase.auth)
+
+    //Google Sign-In
+//    implementation("com.google.android.gms:play-services-auth:21.3.0")
+    implementation(libs.play.services.auth)
+
+
+//    // Kotlin extensions and coroutines support for Jetpack Compose
+//    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation(libs.androidx.activity.compose.v193)
+
+    //Jetpack Compose
+//    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+//    implementation("androidx.navigation:navigation-compose:2.8.5")
+    implementation(libs.androidx.navigation.compose.v285)
+
+//    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation(libs.coil.compose)
+
+//    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation(libs.play.services.maps)
+
+//    implementation("com.google.maps.android:maps-compose:2.11.2")
+    implementation(libs.maps.compose)
+
+//    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation(libs.play.services.location)
+
+//    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
 }
