@@ -115,12 +115,14 @@ class LoginViewModel: ViewModel() {
                 if (revokeTask.isSuccessful) {
                     Log.d(TAG, "Acceso revocado correctamente")
                     auth.signOut()
+                    cambiarConectado(false)
                     Log.d(TAG, "Sesión cerrada correctamente")
                 } else {
                     Log.e(TAG, "Error al revocar el acceso")
                 }
             }
         } else {
+            cambiarConectado(false)
             auth.signOut()
             Log.d(TAG, "Sesión cerrada para usuario no Google")
         }
@@ -168,6 +170,9 @@ class LoginViewModel: ViewModel() {
                         if(!activo){
                             _userActivo.value = false
                         }
+                        else{
+                            cambiarConectado(true)
+                        }
                         _loginSuccess.value = true
                     }
                     else{
@@ -183,10 +188,24 @@ class LoginViewModel: ViewModel() {
 
     }
 
+     fun cambiarConectado(valor: Boolean){
+         if (_currentEmail.value.isNotEmpty()){
+             db.collection(Colecciones.usuarios)
+                 .document(_currentEmail.value)
+                 .update("conectado",valor)
+                 .addOnSuccessListener {
+                     Log.i(TAG,"USUARIO CONECTADO")
+                 }
+                 .addOnFailureListener {
+                     Log.e(TAG,"fallo en update usuario CONECTADO")
+
+                 }
+         }
+    }
+
     fun restart(){
         _loginSuccess.value = false
         _registerSuccess.value = false
-        _userActivo.value = false
     }
 
 

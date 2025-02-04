@@ -53,6 +53,7 @@ class FormularioViewModel: ViewModel(){
             "formCompletado" to true,
             "rol" to "USUARIO",
             "activo" to false,
+            "conectado" to false,
             "formulario" to form
         )
 

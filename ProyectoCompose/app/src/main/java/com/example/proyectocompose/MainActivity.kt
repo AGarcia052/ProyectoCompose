@@ -23,9 +23,10 @@ import com.example.proyectocompose.ui.theme.ProyectoComposeTheme
 import kotlin.math.log
 
 class MainActivity : ComponentActivity() {
+    val loginViewModel = LoginViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        val loginViewModel = LoginViewModel()
+
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -49,6 +50,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loginViewModel.cambiarConectado(false)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        loginViewModel.cambiarConectado(false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        loginViewModel.cambiarConectado(true)
     }
 }
 

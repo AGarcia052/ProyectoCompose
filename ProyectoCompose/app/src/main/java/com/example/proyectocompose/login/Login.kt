@@ -200,7 +200,7 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
 
 }
 
-//TODO(CAMBIAR POR TOAST)
+//TODO(CAMBIAR POR ALERTDIALOG)
 @Composable
 fun UsuarioNoActivo(navController: NavController){
     Column (verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
