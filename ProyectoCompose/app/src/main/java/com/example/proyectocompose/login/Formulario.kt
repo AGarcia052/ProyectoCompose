@@ -85,7 +85,7 @@ fun Formulario(navController: NavController, loginViewModel: LoginViewModel) {
     }
     if(registroCompletado){
         navController.navigate(Rutas.usrNoActivo) {
-            popUpTo(Rutas.login) { inclusive = true }
+            popUpTo(Rutas.login) { inclusive = false }
         }
         viewModel.setRegistroCompletado(false)
     }
