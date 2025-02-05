@@ -100,7 +100,9 @@ fun BodyListaUsuarios(navController: NavController, loginViewModel: LoginViewMod
                 if (usuario.correo != loginViewModel.getCurrentEmail()){
                     ItemUsuario(usuario){
                         listaUsuariosViewModel.seleccionarUsuario(it)
-                        navController.navigate(Rutas.editarUsuario)
+                        navController.navigate(Rutas.editarUsuario){
+                            popUpTo(Rutas.usuariosAdmin) { inclusive = false }
+                        }
                     }
                 }
 

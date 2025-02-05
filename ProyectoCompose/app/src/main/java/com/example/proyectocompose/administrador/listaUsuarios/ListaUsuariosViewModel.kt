@@ -87,7 +87,8 @@ class ListaUsuariosViewModel:ViewModel() {
     }
 
     fun cambiarEstadoUsuario(activo: Boolean){
-        val usuario = _usuarioAEditar.value!!.copy(activado = activo)
+        _usuarioAEditar.value = _usuarioAEditar.value!!.copy(activado = activo)
+        val usuario = _usuarioAEditar.value!!
         db.collection(Colecciones.usuarios).document(usuario.correo)
             .set(usuario)
             .addOnSuccessListener {
@@ -99,7 +100,8 @@ class ListaUsuariosViewModel:ViewModel() {
     }
 
     fun cambiarRolUsuario(rol: String){
-        val usuario = _usuarioAEditar.value!!.copy(rol = rol)
+        _usuarioAEditar.value = _usuarioAEditar.value!!.copy(rol = rol)
+        val usuario = _usuarioAEditar.value!!
         db.collection(Colecciones.usuarios).document(usuario.correo)
             .set(usuario)
             .addOnSuccessListener {

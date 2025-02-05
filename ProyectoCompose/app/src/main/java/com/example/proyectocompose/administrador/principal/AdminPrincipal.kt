@@ -73,7 +73,7 @@ fun TopBarAdminPrincipal(navController: NavController, loginViewModel: LoginView
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text("Dashboard")
+            Text("Opciones de Administrador")
         },
         actions = {
             IconButton(onClick = { mostrarMenuPuntos = true }) {
@@ -87,11 +87,13 @@ fun TopBarAdminPrincipal(navController: NavController, loginViewModel: LoginView
                 opciones = opciones,
                 onItemClick = { opcion ->
                     when (opcion) {
-                        "Perfil" -> navController.navigate(Rutas.perfil)
+                        "Perfil" -> navController.navigate(Rutas.perfil){
+                            popUpTo(Rutas.adminPrincipal) { inclusive = false }
+                        }
                         "Volver al Dashboard" -> navController.popBackStack(Rutas.dashboard, inclusive = false)
                         "Cerrar Sesión" -> {
                             loginViewModel.signOut(contexto)
-                            navController.navigate(Rutas.login)
+                            navController.popBackStack(Rutas.login, inclusive = false)
                         }
                     }
                 },
@@ -150,7 +152,9 @@ fun BodyAdminPrincipal(navController: NavController){
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
-            onClick = { navController.navigate(Rutas.usuariosAdmin) },
+            onClick = { navController.navigate(Rutas.usuariosAdmin){
+                popUpTo(Rutas.adminPrincipal) { inclusive = false }
+            } },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -162,7 +166,9 @@ fun BodyAdminPrincipal(navController: NavController){
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Rutas.quedadasAdmin) },
+            onClick = { navController.navigate(Rutas.quedadasAdmin){
+                popUpTo(Rutas.adminPrincipal) { inclusive = false }
+            } },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()

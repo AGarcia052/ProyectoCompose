@@ -107,11 +107,15 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
                 opciones = opciones,
                 onItemClick = { opcion ->
                     when (opcion) {
-                        "Perfil" -> navController.navigate(Rutas.perfil)
-                        "Opciones de administrador" -> navController.navigate(Rutas.adminPrincipal)
+                        "Perfil" -> navController.navigate(Rutas.perfil){
+                            popUpTo(Rutas.dashboard) { inclusive = false }
+                        }
+                        "Opciones de administrador" -> navController.navigate(Rutas.adminPrincipal){
+                            popUpTo(Rutas.dashboard) { inclusive = false }
+                        }
                         "Cerrar Sesión" -> {
                             loginVM.signOut(contexto)
-                            navController.navigate(Rutas.login)
+                            navController.popBackStack(Rutas.login, inclusive = false)
                         }
                     }
                 },
@@ -183,7 +187,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
-            onClick = { navController.navigate(Rutas.usuariosAfines) },
+            onClick = { navController.navigate(Rutas.usuariosAfines){
+                popUpTo(Rutas.dashboard) { inclusive = false }
+            } },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -195,7 +201,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Rutas.amigos) },
+            onClick = { navController.navigate(Rutas.amigos) {
+                popUpTo(Rutas.dashboard) { inclusive = false }
+            }},
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -207,7 +215,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Rutas.quedadasUsuario) },
+            onClick = { navController.navigate(Rutas.quedadasUsuario){
+                popUpTo(Rutas.dashboard) { inclusive = false }
+            } },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
