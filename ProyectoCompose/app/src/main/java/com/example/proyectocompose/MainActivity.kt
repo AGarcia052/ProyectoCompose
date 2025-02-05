@@ -27,6 +27,7 @@ import com.example.proyectocompose.administrador.listaUsuarios.ListaUsuariosView
 import com.example.proyectocompose.administrador.principal.AdminPrincipal
 import com.example.proyectocompose.usuario.dashboard.Dashboard
 import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
+import com.example.proyectocompose.usuario.perfil.Perfil
 
 class MainActivity : ComponentActivity() {
     val loginViewModel = LoginViewModel()
@@ -64,6 +65,9 @@ class MainActivity : ComponentActivity() {
                     composable(Rutas.editarUsuario){
                         EditarUsuario(navController, listaUsuariosViewModel)
 
+                    }
+                    composable(Rutas.perfil){
+                        Perfil(navController = navController, loginViewModel = loginViewModel)
                     }
                 }
             }
