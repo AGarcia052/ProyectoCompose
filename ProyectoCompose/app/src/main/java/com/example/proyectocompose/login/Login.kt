@@ -81,7 +81,7 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
         if (loginSuccess) {
             loginViewModel.restart()
             navController.navigate(destino) {
-                popUpTo(Rutas.login) { inclusive = true }
+                popUpTo(Rutas.login) { inclusive = false }
             }
         }
     }
@@ -90,7 +90,7 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
         if (registerSuccess) {
             loginViewModel.restart()
             navController.navigate(Rutas.formulario) {
-                popUpTo(Rutas.formulario) { inclusive = true }
+                popUpTo(Rutas.formulario) { inclusive = false }
             }
         }
     }
@@ -208,10 +208,7 @@ fun UsuarioNoActivo(navController: NavController){
         Text(text = "TU USARIO NO HA SIDO ACTIVADO.\nContacta con un administrador para activar tu cuenta")
         Spacer(modifier = Modifier.height(100.dp))
         Button(onClick = {
-
-            navController.navigate(Rutas.login){
-                popUpTo(Rutas.login) { inclusive = true }
-            }
+            navController.popBackStack(Rutas.login, inclusive = false)
 
         }) {
             Text(text="Volver")

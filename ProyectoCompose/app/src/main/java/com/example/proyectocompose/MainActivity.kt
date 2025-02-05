@@ -35,11 +35,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // No hacer nada (bloquea el retroceso)
-            }
-        })
         enableEdgeToEdge()
         setContent {
             ProyectoComposeTheme {
