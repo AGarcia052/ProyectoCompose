@@ -39,23 +39,7 @@ class DashboardViewModel:ViewModel() {
     private val _usuario = MutableStateFlow<User>(User())
     val usuario: StateFlow<User> get() = _usuario
 
-    private val _profileImg = MutableStateFlow<String>("")
-    val profileImg: StateFlow<String> get()  = _profileImg
 
-    private val _userImages = MutableStateFlow<List<String>>(listOf())
-    val userImages: StateFlow<List<String>> get() = _userImages
-
-    private val _imageFile = MutableStateFlow<File?>(null)
-    val imageFile: StateFlow<File?> get() = _imageFile
-
-    private val _imageUri = MutableStateFlow<Uri>(Uri.EMPTY)
-    val imageUri: StateFlow<Uri> get() = _imageUri
-
-    private val _imageUploaded = MutableStateFlow(true)
-    val imageUploaded: StateFlow<Boolean> get() = _imageUploaded
-
-    private val _usuarioMod = MutableStateFlow(false)
-    val usuarioMod: StateFlow<Boolean> get() = _usuarioMod
 
     // QUIZAS USAR .COUNT()
     fun cargarUsuariosConectados(){
@@ -132,103 +116,7 @@ class DashboardViewModel:ViewModel() {
             }
     }
 
-    fun cargarImagenes(){
-        _isLoading.value = true
-        storageRef.child("images/${_usuario.value.correo}/perfil").downloadUrl
-            .addOnSuccessListener { uri ->
-                Log.e(TAG, "Imagen de perfil: "+uri.toString())
-                _profileImg.value = uri.toString()
-                _isLoading.value = false
 
-            }
-            .addOnFailureListener { exception ->
-                Log.e(TAG, "Error al cargar la imagen: ${exception.message}")
-                _isLoading.value = false
-            }
-
-        storageRef.child("images/${_usuario.value.correo}/photos").listAll()
-            .addOnSuccessListener { result ->
-                val urls = mutableListOf<String>()
-                val tasks = result.items.map { ref ->
-                    ref.downloadUrl.addOnSuccessListener { uri ->
-                        urls.add(uri.toString())
-                        if (urls.size == result.items.size){
-                            _userImages.value = urls.toList()
-                            _isLoading.value = false
-                        }
-                    }
-                        .addOnFailureListener {
-                            Log.e(TAG, "Error al cargar la lista: ${it.message}")
-                            _isLoading.value = false
-                        }
-
-                }
-            }
-    }
-
-    fun updateImageUri(uri: Uri) {
-        _imageUri.value = uri
-    }
-
-    fun setImageFile(file: File) {
-        _imageFile.value = file
-    }
-
-    fun uploadImage(context: Context,esPerfil: Boolean,numImg: Int) {
-        _isLoading.value = true
-
-        Log.e(TAG,"ENTRA EN UPLOAD IMAGE")
-
-        val path = if(esPerfil){
-            "images/${_usuario.value.correo}/perfil"
-        } else{
-            "images/${_usuario.value.correo}/photos/foto$numImg"
-        }
-
-        val file = _imageFile.value ?: return
-        val fileUri = Uri.fromFile(file)
-        val ref = storageRef.child(path)
-
-        ref.putFile(fileUri)
-            .addOnSuccessListener {
-                Log.d(TAG, "Imagen subida correctamente. URL de la misma: ${ref.downloadUrl}")
-                _isLoading.value = false
-                _imageUploaded.value = true
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(context, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
-                _isLoading.value = false
-
-            }
-
-    }
-
-    fun setUploaded(value: Boolean){
-        _imageUploaded.value = value
-    }
-    fun setUsuarioMod(value: Boolean){
-        _usuarioMod.value = value
-    }
-
-    fun actualizarUsuario(usuario: User){
-        _isLoading.value = true
-
-        db.collection(Colecciones.usuarios)
-            .document(_usuario.value.correo)
-            .set(usuario)
-            .addOnSuccessListener {
-                Log.e(TAG,"PERFIL: USUARIO ACTUALIZADO CORRECTAMENTE")
-                _isLoading.value = false
-                _usuarioMod.value = true
-            }
-            .addOnFailureListener {
-                Log.e(TAG,"PERFIL: ERROR AL ACTUALIZAR AL USUSARIO\n${it.message}")
-                _isLoading.value = false
-
-            }
-
-
-    }
 
 
 }

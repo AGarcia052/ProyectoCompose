@@ -74,7 +74,7 @@ import java.io.File
 
 
 @Composable
-fun Perfil(navController: NavController, dashboardViewModel: DashboardViewModel) {
+fun Perfil(navController: NavController, dashboardViewModel: DashboardViewModel, perfilViewModel: PerfilViewModel) {
 
 
     Scaffold(
@@ -85,7 +85,7 @@ fun Perfil(navController: NavController, dashboardViewModel: DashboardViewModel)
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BodyProfile(viewModel = dashboardViewModel, navController = navController)
+            BodyProfile(viewModel = dashboardViewModel, navController = navController, perfilViewModel=perfilViewModel)
         }
     }
 
@@ -124,7 +124,7 @@ fun TopBarProfile(navController: NavController) {
 }
 
 @Composable
-fun BodyProfile(viewModel: DashboardViewModel, navController: NavController) {
+fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, perfilViewModel: PerfilViewModel) {
     val usuario = viewModel.usuario.collectAsState()
     val nombre = remember { mutableStateOf(usuario.value.nombre) }
     val apellidos = remember { mutableStateOf(usuario.value.apellidos) }
@@ -140,17 +140,17 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController) {
         remember { mutableStateOf(usuario.value.formulario?.interesSexual ?: "") }
     val textBoxActivos = remember { mutableStateOf(false) }
     //
-    val listaimagenes by viewModel.userImages.collectAsState()
-    val profileImage by viewModel.profileImg.collectAsState()
+    val listaimagenes by perfilViewModel.userImages.collectAsState()
+    val profileImage by perfilViewModel.profileImg.collectAsState()
     val addPhoto = remember { mutableStateOf(false) }
-    val imageFile by viewModel.imageFile.collectAsState()
+    val imageFile by perfilViewModel.imageFile.collectAsState()
     val esPerfil = remember { mutableStateOf(false) }
     val contexto = LocalContext.current
-    val imageUploaded by viewModel.imageUploaded.collectAsState()
+    val imageUploaded by perfilViewModel.imageUploaded.collectAsState()
 
-    val usuarioMod by viewModel.usuarioMod.collectAsState()
+    val usuarioMod by perfilViewModel.usuarioMod.collectAsState()
     val usuarioInicial = remember(usuario.value) { usuario.value.copy() }
-    val isLoading by viewModel.isLoading.collectAsState()
+    val isLoading by perfilViewModel.isLoading.collectAsState()
     val haModificado = remember {
         derivedStateOf {
             usuarioInicial.nombre != nombre.value ||
@@ -170,8 +170,8 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController) {
 
     LaunchedEffect(imageUploaded) {
         if (imageUploaded) {
-            viewModel.cargarImagenes()
-            viewModel.setUploaded(false)
+            perfilViewModel.cargarImagenes(usuario.value)
+            perfilViewModel.setUploaded(false)
         }
     }
 
@@ -180,11 +180,11 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController) {
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
                 imageFile?.let { file ->
-                    viewModel.updateImageUri(Uri.fromFile(file))
-                    viewModel.uploadImage(contexto, esPerfil.value, listaimagenes.size + 1)
+                    perfilViewModel.updateImageUri(Uri.fromFile(file))
+                    perfilViewModel.uploadImage(contexto, esPerfil.value, listaimagenes.size + 1,usuario.value)
                 }
             } else {
-                viewModel.updateImageUri(Uri.EMPTY)
+                perfilViewModel.updateImageUri(Uri.EMPTY)
             }
         }
 
@@ -193,7 +193,7 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController) {
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 val file = File.createTempFile("CAM_", ".jpg", contexto.cacheDir)
-                viewModel.setImageFile(file)
+                perfilViewModel.setImageFile(file)
                 cameraLauncher.launch(
                     FileProvider.getUriForFile(
                         contexto,
@@ -211,9 +211,9 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController) {
                 tempFile.outputStream().use { outputStream ->
                     inputStream?.copyTo(outputStream)
                 }
-                viewModel.updateImageUri(it)
-                viewModel.setImageFile(tempFile)
-                viewModel.uploadImage(contexto, esPerfil.value, listaimagenes.size + 1)
+                perfilViewModel.updateImageUri(it)
+                perfilViewModel.setImageFile(tempFile)
+                perfilViewModel.uploadImage(contexto, esPerfil.value, listaimagenes.size + 1,usuario.value)
             }
         }
 
@@ -400,7 +400,7 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController) {
             ) {
 
                 Button(onClick = {
-                    viewModel.actualizarUsuario(
+                    perfilViewModel.actualizarUsuario(
                         User(
                             nombre = nombre.value,
                             apellidos = apellidos.value,
@@ -447,7 +447,7 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController) {
                 navController.navigate(Rutas.dashboard) {
                     popUpTo(Rutas.dashboard) { inclusive = false }
                 }
-                viewModel.setUsuarioMod(false)
+                perfilViewModel.setUsuarioMod(false)
             }
 
         }
