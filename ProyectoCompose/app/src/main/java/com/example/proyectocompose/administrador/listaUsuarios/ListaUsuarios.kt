@@ -132,7 +132,7 @@ fun ItemUsuario(usuario: User, editar: (User) -> Unit){
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (usuario.activado){
+            if (usuario.activo){
                 Text(text = "Activo", color = Color.Green)
             }else{
                 Text(text = "Inactivo", color = Color.Red)
