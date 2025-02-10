@@ -29,7 +29,7 @@ class PerfilViewModel: ViewModel() {
     private val _profileImg = MutableStateFlow<String>("")
     val profileImg: StateFlow<String> get()  = _profileImg
 
-    private val _userImages = MutableStateFlow<List<String>>(listOf())
+    private val _userImages = MutableStateFlow<List<String>>(emptyList())
     val userImages: StateFlow<List<String>> get() = _userImages
 
     private val _imageFile = MutableStateFlow<File?>(null)
@@ -139,6 +139,19 @@ class PerfilViewModel: ViewModel() {
 
             }
 
+
+    }
+    fun borrarImagen(imagen: String, usuario: User){
+        val ref = storage.getReferenceFromUrl(imagen)
+        ref.delete()
+            .addOnSuccessListener {
+                _userImages.value = emptyList()
+                cargarImagenes(usuario = usuario)
+                // si no va descomentar: _imageUploaded.value = true
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Error al eliminar archivo: ${exception.message}")
+            }
 
     }
 }

@@ -1,11 +1,13 @@
 package com.example.proyectocompose.usuario.dashboard.perfil
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,15 +30,16 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
@@ -51,7 +54,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -123,6 +125,7 @@ fun TopBarProfile(navController: NavController) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, perfilViewModel: PerfilViewModel) {
     val usuario = viewModel.usuario.collectAsState()
@@ -147,7 +150,8 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
     val esPerfil = remember { mutableStateOf(false) }
     val contexto = LocalContext.current
     val imageUploaded by perfilViewModel.imageUploaded.collectAsState()
-
+    val imagenABorrar = remember { mutableStateOf("") }
+    val modPerfil = remember { mutableStateOf(false) }
     val usuarioMod by perfilViewModel.usuarioMod.collectAsState()
     val usuarioInicial = remember(usuario.value) { usuario.value.copy() }
     val isLoading by perfilViewModel.isLoading.collectAsState()
@@ -186,6 +190,7 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
             } else {
                 perfilViewModel.updateImageUri(Uri.EMPTY)
             }
+            esPerfil.value = false
         }
 
 
@@ -215,6 +220,7 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
                 perfilViewModel.setImageFile(tempFile)
                 perfilViewModel.uploadImage(contexto, esPerfil.value, listaimagenes.size + 1,usuario.value)
             }
+            esPerfil.value = false
         }
 
 
@@ -246,7 +252,9 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
                                 contentDescription = "Imagen perfil",
                                 modifier = Modifier
                                     .size(100.dp)
-                                    .border(1.dp, Color.Black)
+                                    .border(1.dp, Color.Black).clickable {
+                                        modPerfil.value = true
+                                    }
                             )
                         } else {
                             Image(
@@ -317,6 +325,16 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
                                 modifier = Modifier
                                     .width(200.dp)
                                     .height(200.dp)
+                                    .combinedClickable(
+                                        onLongClick = {
+                                            imagenABorrar.value = image
+                                        },
+                                        onClick = {
+
+                                        }
+                                    )
+
+
                             )
                         }
                         item {
@@ -354,9 +372,9 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
                     Spacer(modifier = Modifier.height(15.dp))
                 }
 
-                item { SliderPreference("Deportes", deportes.value) { deportes.value = it } }
-                item { SliderPreference("Arte", arte.value) { arte.value = it } }
-                item { SliderPreference("Política", politica.value) { politica.value = it } }
+                item { SliderPreference("Deportes", deportes.intValue) { deportes.intValue = it } }
+                item { SliderPreference("Arte", arte.intValue) { arte.intValue = it } }
+                item { SliderPreference("Política", politica.intValue) { politica.intValue = it } }
 
                 item {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -412,12 +430,12 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
                             rol = usuario.value.rol,
                             formulario = Formulario(
                                 relacionSeria = relacionSeria.value,
-                                deportes = deportes.value,
+                                deportes = deportes.intValue,
                                 interesSexual = interesSexual.value,
-                                politica = politica.value,
+                                politica = politica.intValue,
                                 quiereHijos = quiereHijos.value,
                                 tieneHijos = tieneHijos.value,
-                                arte = arte.value
+                                arte = arte.intValue
                             )
                         )
                     )
@@ -443,11 +461,31 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
                     }
                 )
             }
+            if(modPerfil.value){
+                OpcionFoto(onDismissRequest = {
+                    modPerfil.value = false
+                }) { num ->
+                    modPerfil.value = false
+                    esPerfil.value = true
+                    if (num == 1) {
+                        galleryLauncher.launch("image/*")
+                    } else {
+                        permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                    }
+                }
+            }
+
             if (usuarioMod) {
                 navController.navigate(Rutas.dashboard) {
                     popUpTo(Rutas.dashboard) { inclusive = false }
                 }
                 perfilViewModel.setUsuarioMod(false)
+            }
+            if (imagenABorrar.value.isNotEmpty()){
+                ConfirmarBorrado( onDismissRequest = {imagenABorrar.value = "" } ){
+                    perfilViewModel.borrarImagen(imagenABorrar.value, usuario = usuario.value)
+                    imagenABorrar.value = ""
+                }
             }
 
         }
@@ -457,6 +495,36 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
     }
 }
 
+@Composable
+fun ConfirmarBorrado(onDismissRequest: () -> Unit,
+                     onConfirmation: () -> Unit){
+
+    AlertDialog(
+        icon = {
+            Icon(painterResource(R.drawable.ic_aviso), contentDescription = "Icono Aviso")
+        },
+        title = {
+            Text(text = "Borrar Imagen")
+        },
+        text = {
+            Text(text="¿Estás seguro que quieres eliminar la imagen de forma permanente?")
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirmation() }) {
+                Text(text = "Confirmar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismissRequest() }) {
+                Text(text = "Cancelar")
+            }
+        }
+    )
+
+}
 
 @Composable
 fun OpcionFoto(
@@ -477,8 +545,11 @@ fun OpcionFoto(
             onDismissRequest()
         },
         confirmButton = {
-            Button(onClick = { onConfirmation(1) }) { Text(text = "Galería") }
-            Button(onClick = { onConfirmation(2) }) { Text(text = "Cámara") }
+            Row(horizontalArrangement = Arrangement.SpaceEvenly){
+                Button(onClick = { onConfirmation(1) }) { Text(text = "Galería") }
+                Button(onClick = { onConfirmation(2) }) { Text(text = "Cámara") }
+            }
+
         }
     )
 }

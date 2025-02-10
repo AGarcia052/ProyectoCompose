@@ -20,13 +20,8 @@ import java.io.File
 class DashboardViewModel:ViewModel() {
     val TAG = "AMIGOSAPP"
 
-    /*
-    private val _rol = MutableStateFlow<String>("")
-    val rol: StateFlow<String> get()=_rol*/
 
     private val db = Firebase.firestore
-    private val storage = Firebase.storage
-    val storageRef = storage.reference
     init {
         cargarUsuariosConectados()
     }
@@ -41,7 +36,7 @@ class DashboardViewModel:ViewModel() {
 
 
 
-    // QUIZAS USAR .COUNT()
+    // todo(quizar usar count)
     fun cargarUsuariosConectados(){
         db.collection(Colecciones.usuarios)
             .whereEqualTo("conectado", true)
