@@ -65,13 +65,14 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
     val contexto = LocalContext.current
     val isLoading by dashboardVM.isLoading.collectAsState()
     var mostrarMenuPuntos by remember { mutableStateOf(false) }
-    val rol by dashboardVM.rol.collectAsState()
+    val usuario by dashboardVM.usuario.collectAsState()
     val opciones = listOf("Perfil", "Opciones de administrador", "Cerrar Sesión")
-    LaunchedEffect(rol) {
-        if (rol == "") {
-            dashboardVM.checkRol(loginVM.getCurrentEmail())
+    LaunchedEffect(usuario) {
+        if (usuario.rol.isEmpty()){
+            dashboardVM.cargarUsuario(loginVM.getCurrentEmail())
         }
     }
+
     TopAppBar(
         colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -120,7 +121,7 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
                     }
                 },
                 onDismiss = { mostrarMenuPuntos = false },
-                esAdministrador = { if (rol == "Administrador") true else false }
+                esAdministrador = { if (usuario!!.rol == "Administrador") true else false }
             )
         }
     )

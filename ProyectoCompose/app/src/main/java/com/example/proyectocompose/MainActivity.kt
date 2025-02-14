@@ -27,11 +27,14 @@ import com.example.proyectocompose.administrador.listaUsuarios.ListaUsuariosView
 import com.example.proyectocompose.administrador.principal.AdminPrincipal
 import com.example.proyectocompose.usuario.dashboard.Dashboard
 import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
+import com.example.proyectocompose.usuario.dashboard.perfil.Perfil
+import com.example.proyectocompose.usuario.dashboard.perfil.PerfilViewModel
 
 class MainActivity : ComponentActivity() {
     val loginViewModel = LoginViewModel()
     val dashboardViewModel = DashboardViewModel()
     val listaUsuariosViewModel = ListaUsuariosViewModel()
+    val perfilViewModel = PerfilViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -64,6 +67,9 @@ class MainActivity : ComponentActivity() {
                     composable(Rutas.editarUsuario){
                         EditarUsuario(navController, listaUsuariosViewModel)
 
+                    }
+                    composable(Rutas.perfil){
+                       Perfil(navController = navController, dashboardViewModel = dashboardViewModel, perfilViewModel = perfilViewModel)
                     }
                 }
             }

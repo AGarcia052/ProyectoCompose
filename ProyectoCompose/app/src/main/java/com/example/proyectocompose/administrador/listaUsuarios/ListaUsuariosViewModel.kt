@@ -2,9 +2,6 @@ package com.example.proyectocompose.administrador.listaUsuarios
 
 import android.net.Uri
 import android.util.Log
-import androidx.core.net.toFile
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.proyectocompose.Colecciones
 import com.example.proyectocompose.model.User
@@ -31,7 +28,7 @@ class ListaUsuariosViewModel:ViewModel() {
     fun seleccionarUsuario(usuario: User){
         _usuarioAEditar.value = usuario
         _rol.value = usuario.rol
-        _activo.value = usuario.activado
+        _activo.value = usuario.activo
     }
     fun desseleccionarUsuario(){
         _usuarioAEditar.value = null
@@ -87,11 +84,10 @@ class ListaUsuariosViewModel:ViewModel() {
     }
 
     fun cambiarEstadoUsuario(activo: Boolean){
-        _usuarioAEditar.value = _usuarioAEditar.value!!.copy(activado = activo)
-        val usuario = _usuarioAEditar.value!!
-        db.collection(Colecciones.usuarios).document(usuario.correo)
-            .set(usuario)
+        db.collection(Colecciones.usuarios).document(_usuarioAEditar.value!!.correo)
+            .update("activado",activo)
             .addOnSuccessListener {
+                _usuarioAEditar.value = _usuarioAEditar.value!!.copy(activo = activo)
                 Log.d(TAG, "Estado del usuario actualizado")
             }
             .addOnFailureListener {
@@ -100,11 +96,10 @@ class ListaUsuariosViewModel:ViewModel() {
     }
 
     fun cambiarRolUsuario(rol: String){
-        _usuarioAEditar.value = _usuarioAEditar.value!!.copy(rol = rol)
-        val usuario = _usuarioAEditar.value!!
-        db.collection(Colecciones.usuarios).document(usuario.correo)
-            .set(usuario)
+        db.collection(Colecciones.usuarios).document(_usuarioAEditar.value!!.correo)
+            .update("rol",rol)
             .addOnSuccessListener {
+                _usuarioAEditar.value = _usuarioAEditar.value!!.copy(rol = rol)
                 Log.d(TAG, "Rol del usuario actualizado")
             }
             .addOnFailureListener {

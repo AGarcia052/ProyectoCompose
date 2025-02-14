@@ -1,22 +1,27 @@
 package com.example.proyectocompose.usuario.dashboard
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.proyectocompose.Colecciones
+import com.example.proyectocompose.model.Formulario
 import com.example.proyectocompose.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.io.File
 
 class DashboardViewModel:ViewModel() {
     val TAG = "AMIGOSAPP"
 
-    private val _rol = MutableStateFlow<String>("")
-    val rol: StateFlow<String> get()=_rol
 
     private val db = Firebase.firestore
-
     init {
         cargarUsuariosConectados()
     }
@@ -26,6 +31,12 @@ class DashboardViewModel:ViewModel() {
     private val _numUsuariosConectados = MutableStateFlow<Int?>(null)
     val numUsuariosConectados: StateFlow<Int?> get()=_numUsuariosConectados
 
+    private val _usuario = MutableStateFlow<User>(User())
+    val usuario: StateFlow<User> get() = _usuario
+
+
+
+    // todo(quizar usar count)
     fun cargarUsuariosConectados(){
         db.collection(Colecciones.usuarios)
             .whereEqualTo("conectado", true)
@@ -40,6 +51,7 @@ class DashboardViewModel:ViewModel() {
             }
     }
 
+    /*
     fun checkRol(email:String){
         _isLoading.value = true
 
@@ -58,5 +70,48 @@ class DashboardViewModel:ViewModel() {
                 Log.e(TAG,"ERROR AL OBTENER EL ROL")
             }
 
+    }*/
+
+    fun cargarUsuario(email:String){
+        _isLoading.value = true
+        db.collection(Colecciones.usuarios)
+            .document(email)
+            .get()
+            .addOnSuccessListener { result ->
+                val datos = result.data
+                datos?.let {
+                    _usuario.value.nombre = datos["nombre"] as String
+                    _usuario.value.apellidos = datos["apellidos"] as String
+                    _usuario.value.rol = datos["rol"] as String
+                    _usuario.value.fecNac = datos["fecNac"] as String
+                    _usuario.value.correo = datos["correo"] as String
+                    _usuario.value.conectado = datos["conectado"] as Boolean
+                    _usuario.value.activo = datos["activo"] as Boolean
+                    _usuario.value.formCompletado = datos["formCompletado"] as Boolean
+                    val formulario = datos["formulario"] as Map<*, *>
+                    formulario.let{
+                        _usuario.value.formulario = Formulario(
+
+                            relacionSeria = it["relacionSeria"] as Boolean,
+                            deportes = (it["deportes"] as Long).toInt(),
+                            arte = (it["arte"] as Long).toInt(),
+                            politica = (it["politica"] as Long).toInt(),
+                            tieneHijos = it["tieneHijos"] as Boolean,
+                            quiereHijos = it["quiereHijos"] as Boolean,
+                            interesSexual = it["interesSexual"] as String
+                        )
+                    }
+                }
+                _isLoading.value = false
+                Log.e(TAG,"DATOS USUARIO"+_usuario.value.toString())
+            }
+            .addOnFailureListener {
+                Log.e(TAG,"ERROR AL OBTENER EL USUARIO")
+                _isLoading.value = false
+            }
     }
+
+
+
+
 }

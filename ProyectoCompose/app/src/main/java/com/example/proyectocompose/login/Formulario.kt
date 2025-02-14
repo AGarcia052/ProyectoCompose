@@ -61,6 +61,7 @@ import com.example.proyectocompose.R
 import com.example.proyectocompose.Rutas
 import com.example.proyectocompose.common.BodyText
 import com.example.proyectocompose.common.ClickableText
+import com.example.proyectocompose.common.ComboBox
 import com.example.proyectocompose.common.Subtitle
 import java.io.File
 import java.util.Calendar
@@ -342,7 +343,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
             item{
                 Row(verticalAlignment = Alignment.CenterVertically){
                     Text("¿Tienes hijos?: ", modifier = Modifier.padding(end=10.dp))
-                    ComboBox (listOf("No","Si")) { viewModel.tieneHijos.value = it as Boolean }
+                    ComboBox (listOf("No","Si")) { viewModel.tieneHijos.value = it == "Si" }
                 }
                 Spacer(modifier = Modifier.height(15.dp))
             }
@@ -350,7 +351,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
             item {
                 Row(verticalAlignment = Alignment.CenterVertically){
                     Text("¿Quieres tener hijos?: ", modifier = Modifier.padding(end=10.dp))
-                    ComboBox (listOf("No","Si")) { viewModel.quiereHijos.value = it as Boolean }
+                    ComboBox (listOf("No","Si")) { viewModel.quiereHijos.value = it =="Si" }
                 }
                 Spacer(modifier = Modifier.height(15.dp))
             }
@@ -358,7 +359,7 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
             item{
                 Row(verticalAlignment = Alignment.CenterVertically){
                     Text("Interesado en: ", modifier = Modifier.padding(end=10.dp))
-                    ComboBox (listOf("","Mujer","Hombre","Ambos")) { viewModel.interesSexual.value = it as String }
+                    ComboBox (listOf("Mujer","Hombre","Ambos")) { viewModel.interesSexual.value = it }
                 }
 
                 Spacer(modifier = Modifier.height(35.dp))
@@ -421,52 +422,7 @@ fun SliderPreference(title: String, value: Int, onValueChange: (Int) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ComboBox(opciones: List<String>,onOptionSelected: (Any) -> Unit) {
 
-    var selectedOption by remember { mutableStateOf(opciones.first()) }
-    var isExpanded by remember { mutableStateOf(false) }
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        ExposedDropdownMenuBox(
-            expanded = isExpanded,
-            onExpandedChange = { isExpanded = it }
-        ) {
-            TextField(
-                value = selectedOption,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { TrailingIcon(expanded = isExpanded) },
-                modifier = Modifier.menuAnchor().width(150.dp).height(50.dp)
-
-            )
-
-            ExposedDropdownMenu(
-                expanded = isExpanded,
-                onDismissRequest = { isExpanded = false }
-            ) {
-                opciones.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(text = option) },
-                        onClick = {
-                            selectedOption = option
-                            when(selectedOption){
-                                "No" ->onOptionSelected(false)
-                                "Si" -> onOptionSelected(true)
-                                "" -> ""
-                                else -> onOptionSelected(selectedOption)
-                            }
-
-                            isExpanded = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun DatePickerEdad(fechaElegida: String, onDateSelected: (String) -> Unit) {
