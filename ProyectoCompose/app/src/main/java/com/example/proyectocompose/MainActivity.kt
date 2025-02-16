@@ -2,16 +2,8 @@ package com.example.proyectocompose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -25,6 +17,10 @@ import com.example.proyectocompose.administrador.listaUsuarios.EditarUsuario
 import com.example.proyectocompose.administrador.listaUsuarios.ListaUsuarios
 import com.example.proyectocompose.administrador.listaUsuarios.ListaUsuariosViewModel
 import com.example.proyectocompose.administrador.principal.AdminPrincipal
+import com.example.proyectocompose.administrador.quedadas.AniadirQuedada
+import com.example.proyectocompose.administrador.quedadas.EditarQuedada
+import com.example.proyectocompose.administrador.quedadas.QuedadasAdmin
+import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
 import com.example.proyectocompose.usuario.dashboard.Dashboard
 import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 import com.example.proyectocompose.usuario.dashboard.perfil.Perfil
@@ -35,6 +31,7 @@ class MainActivity : ComponentActivity() {
     val dashboardViewModel = DashboardViewModel()
     val listaUsuariosViewModel = ListaUsuariosViewModel()
     val perfilViewModel = PerfilViewModel()
+    val quedadasAdminViewModel = QuedadasAdminViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -70,6 +67,15 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Rutas.perfil){
                        Perfil(navController = navController, dashboardViewModel = dashboardViewModel, perfilViewModel = perfilViewModel)
+                    }
+                    composable(Rutas.quedadasAdmin){
+                        QuedadasAdmin(navController = navController, viewModel = quedadasAdminViewModel)
+                    }
+                    composable(Rutas.addQuedada){
+                        AniadirQuedada(navController = navController, viewModel = quedadasAdminViewModel)
+                    }
+                    composable(Rutas.editarQuedada){
+                        EditarQuedada(navController = navController, viewModel = quedadasAdminViewModel)
                     }
                 }
             }
