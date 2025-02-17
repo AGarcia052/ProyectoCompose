@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.example.proyectocompose.Colecciones
+import com.example.proyectocompose.Constantes
 import com.example.proyectocompose.model.Quedada
 import com.example.proyectocompose.model.User
 import com.example.proyectocompose.model.UserQuedada
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 class QuedadasAdminViewModel : ViewModel() {
 
-    val TAG = "AMIGOSAPP"
     val db = Firebase.firestore
 
 
@@ -66,6 +66,7 @@ class QuedadasAdminViewModel : ViewModel() {
         var disponibles: ArrayList<UserQuedada> = arrayListOf()
         var userQuedada: UserQuedada
         db.collection(Colecciones.usuarios)
+            .whereEqualTo("activo",true)
             .get()
             .addOnSuccessListener { results ->
                 results.documents.mapNotNull { document ->
@@ -80,7 +81,7 @@ class QuedadasAdminViewModel : ViewModel() {
                         }
 
                     }catch (error: Exception){
-                        Log.e(TAG,"Error al guardar los usuarios\n$error")
+                        Log.e(Constantes.TAG,"Error al guardar los usuarios\n$error")
                     }
                 }
 
@@ -88,10 +89,10 @@ class QuedadasAdminViewModel : ViewModel() {
                 _usuariosElegidos.value = elegidos
                 _usuariosObtenidos.value = true
 
-                Log.i(TAG,"Usuarios obtenidos correctamente\nDisponibles: ${disponibles}\nElegidos: ${elegidos}")
+                Log.i(Constantes.TAG,"Usuarios obtenidos correctamente\nDisponibles: ${disponibles}\nElegidos: ${elegidos}")
             }
             .addOnFailureListener {error->
-                Log.e(TAG,"Error al obtener los usuarios\n$error")
+                Log.e(Constantes.TAG,"Error al obtener los usuarios\n$error")
 
             }
     }
@@ -116,24 +117,41 @@ class QuedadasAdminViewModel : ViewModel() {
                             inscripcion = inscripcionAbierta
                         )
                     } catch (e: Exception) {
-                        Log.e(TAG, "Error al guardar las quedadas: \n${e.printStackTrace()}")
+                        Log.e(Constantes.TAG, "Error al guardar las quedadas: \n${e.printStackTrace()}")
                         null
                     }
                 }
                 _quedadas.clear()
                 _quedadas.addAll(todos)
-                Log.i(TAG, "Quedadas recuperadas con exito")
+                Log.i(Constantes.TAG, "Quedadas recuperadas con exito")
                 _isLoading.value = false
             }
             .addOnFailureListener {error->
-                Log.e(TAG, "Error al obtener las quedadas de firebase\n$error")
+                Log.e(Constantes.TAG, "Error al obtener las quedadas de firebase\n$error")
                 _isLoading.value = false
+
+            }
+    }
+    
+    fun borrarQuedada(quedada: Quedada){
+        _isLoading.value = true
+        db.collection(Colecciones.quedadas)
+            .document(quedada.nombre)
+            .delete()
+            .addOnSuccessListener {
+                _isLoading.value = false
+                Log.i(Constantes.TAG,"quedadaAdminVW: QUEDADA ${quedada.nombre} BORRADA")
+                getQuedadas()
+            }
+            .addOnFailureListener {error ->
+                _isLoading.value = false
+                Log.e(Constantes.TAG,"quedadaAdminVW: QUEDADA ${quedada.nombre}, ERROR AL BORRAR\n$error")
 
             }
     }
 
     fun addLoc(loc: LatLng) {
-        Log.i(TAG, "AÑADIDA LOCALIZACION: ")
+        Log.i(Constantes.TAG, "AÑADIDA LOCALIZACION: ")
         _locNuevaQuedada.value = loc
     }
 
@@ -167,7 +185,7 @@ class QuedadasAdminViewModel : ViewModel() {
                         .set(quedada)
                         .addOnSuccessListener {
                             _quedadaCreada.value = true
-                            Log.i(TAG, "Quedada creada correctamente")
+                            Log.i(Constantes.TAG, "Quedada creada correctamente")
                             _isLoading.value = false
                             Toast.makeText(
                                 context,
@@ -178,7 +196,7 @@ class QuedadasAdminViewModel : ViewModel() {
                         }
 
                         .addOnFailureListener {
-                            Log.e(TAG, "Error al crear la quedada")
+                            Log.e(Constantes.TAG, "Error al crear la quedada")
                             _isLoading.value = false
                             Toast.makeText(context, "Error al crear la quedada", Toast.LENGTH_SHORT)
                                 .show()
@@ -187,7 +205,7 @@ class QuedadasAdminViewModel : ViewModel() {
                 }
             }
             .addOnFailureListener {
-                Log.e(TAG, "Error al obtener el documento")
+                Log.e(Constantes.TAG, "Error al obtener el documento")
             }
 
 
@@ -220,7 +238,7 @@ class QuedadasAdminViewModel : ViewModel() {
                         .addOnSuccessListener {
                             _quedadaModificada.value = true
                             Log.i(
-                                TAG,
+                                Constantes.TAG,
                                 "Quedada $nombreInicial modificada a ${_quedadaSelecc.value.nombre} con exito"
                             )
                             _isLoading.value = false
@@ -228,14 +246,14 @@ class QuedadasAdminViewModel : ViewModel() {
                         .addOnFailureListener { error ->
                             _isLoading.value = false
                             Log.e(
-                                TAG,
+                                Constantes.TAG,
                                 "Error al modificar quedada con nuevo nombre ${_quedadaSelecc.value.nombre}\n$error"
                             )
                         }
                 }
                 .addOnFailureListener { error ->
                     _isLoading.value = false
-                    Log.e(TAG, "Error al borrar la quedada $nombreInicial\n$error")
+                    Log.e(Constantes.TAG, "Error al borrar la quedada $nombreInicial\n$error")
                 }
         } else {
             db.collection(Colecciones.quedadas)
@@ -244,11 +262,11 @@ class QuedadasAdminViewModel : ViewModel() {
                 .addOnSuccessListener {
                     _isLoading.value = false
                     _quedadaModificada.value = true
-                    Log.i(TAG, "Quedada $nombreInicial modificada con éxito")
+                    Log.i(Constantes.TAG, "Quedada $nombreInicial modificada con éxito")
                 }
                 .addOnFailureListener { error ->
                     _isLoading.value = false
-                    Log.e(TAG, "Error al modificar la quedada $nombreInicial\n$error")
+                    Log.e(Constantes.TAG, "Error al modificar la quedada $nombreInicial\n$error")
                 }
         }
 

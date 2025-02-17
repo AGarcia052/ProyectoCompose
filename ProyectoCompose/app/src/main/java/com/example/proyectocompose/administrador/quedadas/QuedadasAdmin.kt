@@ -1,7 +1,9 @@
 package com.example.proyectocompose.administrador.quedadas
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -124,7 +128,7 @@ fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavContro
         LazyColumn(modifier = Modifier.fillMaxSize()) {
 
             items(quedadas) { quedada ->
-                ItemQuedada(quedada, navController,viewModel)
+                ItemQuedada(quedada, navController, viewModel)
             }
         }
 
@@ -146,35 +150,62 @@ fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavContro
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: QuedadasAdminViewModel) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)
-        .border(1.dp, color = Color.Gray, RectangleShape)
-        .clickable {
-            viewModel.setQuedadaSelecc(quedada)
-            navController.navigate(Rutas.editarQuedada)
-        }
-    ) {
-        Column {
-            Subtitle(text = quedada.nombre)
-            Spacer(modifier = Modifier.height(8.dp))
-            BodyText(text = "Número de asistentes: ${quedada.correosUsr.size}")
-            Spacer(modifier = Modifier.height(8.dp))
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                BodyText(text = "Ubicación: ${quedada.ubicacion}")
-                Spacer(modifier = Modifier.width(8.dp))
-                BodyText(text = "Fecha: ${quedada.fecha}")
-            }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .border(1.dp, color = Color.Gray, RectangleShape)
+            .combinedClickable(
+                onClick = {
+                    viewModel.setQuedadaSelecc(quedada)
+                    navController.navigate(Rutas.editarQuedada)
+                },
+                onLongClick = {
+                    showDeleteDialog = true
+                }
+            )
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Subtitle(text = quedada.nombre)
+            Spacer(modifier = Modifier.height(4.dp))
+            BodyText(text = "Número de asistentes: ${quedada.correosUsr.size}")
+            Spacer(modifier = Modifier.height(4.dp))
+
+
+            BodyText(text = "Ubicación: ${quedada.ubicacion}")
+            Spacer(modifier = Modifier.height(4.dp))
+            BodyText(text = "Fecha: ${quedada.fecha}")
+
         }
     }
 
-
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Eliminar Quedada") },
+            text = { Text("¿Estás seguro de que quieres eliminar esta quedada?") },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.borrarQuedada(quedada)
+                    showDeleteDialog = false
+                }) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
 
 
@@ -264,12 +295,11 @@ fun AniadirQuedada(navController: NavController, viewModel: QuedadasAdminViewMod
 
         }
 
-        if(quedadaCreada){
+        if (quedadaCreada) {
             navController.navigate(Rutas.quedadasAdmin)
             viewModel.setQuedadaCreada(false)
         }
     }
-
 
 
 }
