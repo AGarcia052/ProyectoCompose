@@ -20,6 +20,7 @@ import com.example.proyectocompose.administrador.principal.AdminPrincipal
 import com.example.proyectocompose.administrador.quedadas.AniadirQuedada
 import com.example.proyectocompose.administrador.quedadas.EditarQuedada
 import com.example.proyectocompose.administrador.quedadas.QuedadasAdmin
+import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQuedadaViewModel
 import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
 import com.example.proyectocompose.usuario.dashboard.Dashboard
 import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
@@ -32,6 +33,7 @@ class MainActivity : ComponentActivity() {
     val listaUsuariosViewModel = ListaUsuariosViewModel()
     val perfilViewModel = PerfilViewModel()
     val quedadasAdminViewModel = QuedadasAdminViewModel()
+    val mapsAdminQuedadaViewModel = MapsAdminQuedadaViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -75,7 +77,7 @@ class MainActivity : ComponentActivity() {
                         AniadirQuedada(navController = navController, viewModel = quedadasAdminViewModel)
                     }
                     composable(Rutas.editarQuedada){
-                        EditarQuedada(navController = navController, viewModel = quedadasAdminViewModel)
+                        EditarQuedada(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
                     }
                 }
             }
