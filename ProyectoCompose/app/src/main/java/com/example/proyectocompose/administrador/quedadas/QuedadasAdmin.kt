@@ -191,76 +191,85 @@ fun AniadirQuedada(navController: NavController, viewModel: QuedadasAdminViewMod
     val nombre = remember { mutableStateOf("") }
     val quedadaCreada by viewModel.quedadaCreada.collectAsState()
     val context = LocalContext.current
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
-    ) {
 
-        TitleText(text = "Nueva Quedada")
 
-        Spacer(modifier = Modifier.height(30.dp))
 
-        TextField(
-            value = nombre.value,
-            onValueChange = { nombre.value = it },
-            placeholder = { Text("Nombre:") }
-        )
+    Scaffold(
+        topBar = {
+            TopBarQuedadasAdmin(navController = navController)
+        }) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        Spacer(modifier = Modifier.height(30.dp))
+            TitleText(text = "Nueva Quedada")
 
-        SeleccionarFecha(fecha.value) { fecha.value = it }
+            Spacer(modifier = Modifier.height(30.dp))
 
-        Spacer(modifier = Modifier.height(30.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            if (localicacion != null) {
-                BodyText(text = "Localizacion actual: ${localicacion!!.toCustomString()}")
-                Spacer(modifier = Modifier.height(15.dp))
+            TextField(
+                value = nombre.value,
+                onValueChange = { nombre.value = it },
+                placeholder = { Text("Nombre:") }
+            )
 
+            Spacer(modifier = Modifier.height(30.dp))
+
+            SeleccionarFecha(fecha.value) { fecha.value = it }
+
+            Spacer(modifier = Modifier.height(30.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                if (localicacion != null) {
+                    BodyText(text = "Localizacion actual: ${localicacion!!.toCustomString()}")
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                }
             }
-        }
 
-        Button(onClick = { showSeleccUbicacion.value = true }) {
-            Text(text = "Seleccionar ubicacion")
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
-            Button(onClick = {
-                viewModel.crearQuedada(
-                    fecha = fecha.value,
-                    nombre = nombre.value,
-                    context = context
-                )
-            }, enabled = isBtnActivo.value) {
-                BodyText(text = "Crear")
+            Button(onClick = { showSeleccUbicacion.value = true }) {
+                Text(text = "Seleccionar ubicacion")
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
+                Button(onClick = {
+                    viewModel.crearQuedada(
+                        fecha = fecha.value,
+                        nombre = nombre.value,
+                        context = context
+                    )
+                }, enabled = isBtnActivo.value) {
+                    BodyText(text = "Crear")
+                }
+            }
+
+
         }
 
 
+
+        if (showSeleccUbicacion.value) {
+            SeleccionarUbicacion(
+                viewModel = mapsViewModel,
+                quedadaViewModel = viewModel
+            ) { showSeleccUbicacion.value = false }
+        }
+
+        if (localicacion != null && nombre.value.trim().length > 5 && fecha.value.isNotEmpty()) {
+            isBtnActivo.value = true
+        } else {
+            isBtnActivo.value = false
+
+        }
+
+        if(quedadaCreada){
+            navController.navigate(Rutas.quedadasAdmin)
+            viewModel.setQuedadaCreada(false)
+        }
     }
 
-
-
-    if (showSeleccUbicacion.value) {
-        SeleccionarUbicacion(
-            viewModel = mapsViewModel,
-            quedadaViewModel = viewModel
-        ) { showSeleccUbicacion.value = false }
-    }
-
-    if (localicacion != null && nombre.value.trim().length > 5 && fecha.value.isNotEmpty()) {
-        isBtnActivo.value = true
-    } else {
-        isBtnActivo.value = false
-
-    }
-
-    if(quedadaCreada){
-        navController.navigate(Rutas.quedadasAdmin)
-        viewModel.setQuedadaCreada(false)
-    }
 
 
 }
