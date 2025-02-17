@@ -56,7 +56,6 @@ class LoginViewModel: ViewModel() {
                 _isLoading.value = false
 
                 if (task.isSuccessful) {
-                    _loginSuccess.value = true
                     _currentEmail.value = auth.currentUser?.email!!
                     checkForm()
                     Log.i(Constantes.TAG,"LOGINVW: Login con email correcto")
