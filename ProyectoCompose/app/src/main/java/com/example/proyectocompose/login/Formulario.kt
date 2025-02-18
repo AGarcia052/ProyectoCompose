@@ -7,9 +7,11 @@ import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -31,6 +35,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
@@ -182,7 +187,6 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
         }
     }
 
-
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             val file = File.createTempFile("CAM_", ".jpg", contexto.cacheDir)
@@ -202,187 +206,167 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
         }
     }
 
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 70.dp, horizontal = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(vertical = 70.dp, horizontal = 40.dp)
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            item{
-                Column(horizontalAlignment = Alignment.CenterHorizontally){
-                    Text(text="Datos Personales", fontSize = 30.sp, lineHeight = 35.sp)
-                    Spacer(modifier=Modifier.padding(bottom=20.dp))
-                    HorizontalDivider()
-                }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "Datos Personales", fontSize = 30.sp, lineHeight = 35.sp)
+                Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                HorizontalDivider()
             }
 
-            item{
-                TextField(value =nombre, onValueChange = {viewModel.nombre.value = it}, placeholder = { Text(text="Nombre: ")})
-                Spacer(modifier = Modifier.height(30.dp))
-            }
+            TextField(value = nombre, onValueChange = { viewModel.nombre.value = it }, placeholder = { Text(text = "Nombre: ") })
+            Spacer(modifier = Modifier.height(30.dp))
 
-            item{
-                TextField(value =apellidos, onValueChange = {viewModel.apellidos.value = it}, placeholder = { Text(text="Apellidos: ")})
-                Spacer(modifier = Modifier.height(10.dp))
-            }
+            TextField(value = apellidos, onValueChange = { viewModel.apellidos.value = it }, placeholder = { Text(text = "Apellidos: ") })
+            Spacer(modifier = Modifier.height(10.dp))
 
-            item{
-                DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-            item{
-                Text(text="Imagen de perfil: ", modifier = Modifier.padding(bottom=10.dp))
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()){
-                    if (imageUri != Uri.EMPTY) {
-                        AsyncImage(
-                            model = imageUri,
-                            contentDescription = "Imagen perfil",
-                            modifier = Modifier
-                                .size(200.dp).border(1.dp,Color.Black)
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(R.drawable.ic_no_image),
-                            contentDescription ="Imagen perfil",
-                            modifier = Modifier
-                                .size(200.dp).border(1.dp,Color.Black)
-                        )
-                    }
+            DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
+            Spacer(modifier = Modifier.height(20.dp))
 
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        IconButton(onClick = {galleryLauncher.launch("image/*")}, modifier = Modifier
-                            .padding(8.dp)
-                            .size(48.dp)) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_gallery),
-                                contentDescription = "Galeria",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        IconButton(onClick = {permissionLauncher.launch(android.Manifest.permission.CAMERA)}, modifier = Modifier
-                            .padding(8.dp)
-                            .size(48.dp)) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_camera),
-                                contentDescription = "Cámara",
-                                modifier = Modifier.size(24.dp),
-
-                                )
-                        }
-                    }
-
-                }
-
-                Spacer(modifier = Modifier.height(45.dp))
-            }
-
-            item{
-                Column(horizontalAlignment = Alignment.CenterHorizontally){
-                    Text(text="Preferencias:", fontSize = 30.sp, lineHeight = 35.sp)
-                    Spacer(modifier=Modifier.padding(bottom=20.dp))
-                    HorizontalDivider()
-                }
-            }
-
-            item{
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Relación seria:",
+            Text(text = "Imagen de perfil: ", modifier = Modifier.padding(bottom = 10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
+                if (imageUri != Uri.EMPTY) {
+                    AsyncImage(
+                        model = imageUri,
+                        contentDescription = "Imagen perfil",
                         modifier = Modifier
-                            .weight(0.5f)
-                            .padding(end = 10.dp)
+                            .size(200.dp).border(1.dp, Color.Black)
                     )
-                    Switch(
-                        checked = relacionSeria,
-                        onCheckedChange = { viewModel.relacionSeria.value = it },
-                        modifier = Modifier.weight(0.5f)
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.ic_no_image),
+                        contentDescription = "Imagen perfil",
+                        modifier = Modifier
+                            .size(200.dp).border(1.dp, Color.Black)
                     )
                 }
-                Spacer(modifier = Modifier.height(15.dp))
-            }
 
-            item{
-                SliderPreference(
-                    title = "deportes",
-                    value = deportes,
-                    onValueChange = { viewModel.deportes.value = it })
-                Spacer(modifier = Modifier.height(25.dp))
-            }
-
-            item{
-                SliderPreference(
-                    title = "arte",
-                    value = arte,
-                    onValueChange = { viewModel.arte.value = it })
-                Spacer(modifier = Modifier.height(25.dp))
-            }
-
-            item{
-                SliderPreference(
-                    title = "política",
-                    value = politica,
-                    onValueChange = { viewModel.politica.value = it })
-                Spacer(modifier = Modifier.height(25.dp))
-            }
-
-            item{
-                Row(verticalAlignment = Alignment.CenterVertically){
-                    Text("¿Tienes hijos?: ", modifier = Modifier.padding(end=10.dp))
-                    ComboBox (listOf("No","Si")) { viewModel.tieneHijos.value = it == "Si" }
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    IconButton(onClick = { galleryLauncher.launch("image/*") }, modifier = Modifier
+                        .padding(8.dp)
+                        .size(48.dp)) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_gallery),
+                            contentDescription = "Galeria",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    IconButton(onClick = { permissionLauncher.launch(android.Manifest.permission.CAMERA) }, modifier = Modifier
+                        .padding(8.dp)
+                        .size(48.dp)) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_camera),
+                            contentDescription = "Cámara",
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.height(15.dp))
             }
 
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically){
-                    Text("¿Quieres tener hijos?: ", modifier = Modifier.padding(end=10.dp))
-                    ComboBox (listOf("No","Si")) { viewModel.quiereHijos.value = it =="Si" }
-                }
-                Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(45.dp))
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "Preferencias:", fontSize = 30.sp, lineHeight = 35.sp)
+                Spacer(modifier = Modifier.padding(bottom = 20.dp))
+                HorizontalDivider()
             }
 
-            item{
-                Row(verticalAlignment = Alignment.CenterVertically){
-                    Text("Interesado en: ", modifier = Modifier.padding(end=10.dp))
-                    ComboBox (listOf("Mujer","Hombre","Ambos")) { viewModel.interesSexual.value = it }
-                }
-
-                Spacer(modifier = Modifier.height(35.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Relación seria:",
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .padding(end = 10.dp)
+                )
+                Switch(
+                    checked = relacionSeria,
+                    onCheckedChange = { viewModel.relacionSeria.value = it },
+                    modifier = Modifier.weight(0.5f)
+                )
             }
-            
+            Spacer(modifier = Modifier.height(15.dp))
+
+            SliderPreference(
+                title = "deportes",
+                value = deportes,
+                onValueChange = { viewModel.deportes.value = it }
+            )
+            Spacer(modifier = Modifier.height(25.dp))
+
+            SliderPreference(
+                title = "arte",
+                value = arte,
+                onValueChange = { viewModel.arte.value = it }
+            )
+            Spacer(modifier = Modifier.height(25.dp))
+
+            SliderPreference(
+                title = "política",
+                value = politica,
+                onValueChange = { viewModel.politica.value = it }
+            )
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("¿Tienes hijos?: ", modifier = Modifier.padding(end = 10.dp))
+                ComboBox(listOf("No", "Si")) { viewModel.tieneHijos.value = it == "Si" }
+            }
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("¿Quieres tener hijos?: ", modifier = Modifier.padding(end = 10.dp))
+                ComboBox(listOf("No", "Si")) { viewModel.quiereHijos.value = it == "Si" }
+            }
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Interesado en: ", modifier = Modifier.padding(end = 10.dp))
+                ComboBox(listOf("Mujer", "Hombre", "Ambos")) { viewModel.interesSexual.value = it }
+            }
+
+            Spacer(modifier = Modifier.height(35.dp))
         }
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom,
-            modifier = Modifier.fillMaxWidth()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .align(Alignment.BottomCenter)
         ) {
-            Button(onClick = back) {
-                Text("Atrás")
-            }
-            Button(onClick = next, enabled = btnEnabled) {
-                Text("Finalizar")
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Button(onClick = back) {
+                    Text("Atrás")
+                }
+                Button(onClick = next, enabled = btnEnabled) {
+                    Text("Finalizar")
+                }
             }
         }
     }
-
-
-
 }
+
 
 @Composable
 fun SliderPreference(title: String, value: Int, onValueChange: (Int) -> Unit) {

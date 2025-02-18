@@ -51,27 +51,6 @@ class DashboardViewModel:ViewModel() {
             }
     }
 
-    /*
-    fun checkRol(email:String){
-        _isLoading.value = true
-
-        db.collection(Colecciones.usuarios)
-            .document(email)
-            .get()
-            .addOnSuccessListener { result ->
-                val datos = result.data
-                datos?.let {
-                    _rol.value = datos["rol"] as String
-                }
-                _isLoading.value = false
-
-            }
-            .addOnFailureListener {
-                Log.e(TAG,"ERROR AL OBTENER EL ROL")
-            }
-
-    }*/
-
     fun cargarUsuario(email:String){
         _isLoading.value = true
         db.collection(Colecciones.usuarios)
