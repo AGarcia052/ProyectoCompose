@@ -1,7 +1,6 @@
 package com.example.proyectocompose.administrador.listaUsuarios
 
 import android.net.Uri
-import android.widget.ProgressBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +42,6 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.proyectocompose.R
 import com.example.proyectocompose.Rutas
-import com.example.proyectocompose.login.LoginViewModel
 
 @Composable
 fun EditarUsuario(navController: NavController, listaUsuariosViewModel: ListaUsuariosViewModel){
@@ -117,13 +115,13 @@ fun BodyEditarUsuario(navController: NavController, listaUsuariosViewModel: List
                 Text(text = "Cancelar")
             }
             Button(onClick = {
-                if (usuarioAEditar!!.activado != listaUsuariosViewModel.activo.value){
+                if (usuarioAEditar!!.activo != listaUsuariosViewModel.activo.value){
                     listaUsuariosViewModel.cambiarEstadoUsuario(listaUsuariosViewModel.activo.value)
                 }
                 if (usuarioAEditar!!.rol != listaUsuariosViewModel.rol.value){
                     listaUsuariosViewModel.cambiarRolUsuario(listaUsuariosViewModel.rol.value)
                 }
-                listaUsuariosViewModel.desseleccionarUsuario()
+                //listaUsuariosViewModel.desseleccionarUsuario()
                 listaUsuariosViewModel.cargarUsuarios()
                 navController.popBackStack(Rutas.usuariosAdmin, inclusive = false)
             }) {

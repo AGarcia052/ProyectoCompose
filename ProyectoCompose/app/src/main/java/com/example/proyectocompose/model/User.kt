@@ -1,14 +1,15 @@
 package com.example.proyectocompose.model
 
 data class User(
-    val correo: String = "",
-    val nombre: String = "",
-    val apellidos: String = "",
-    val fecNac: String = "",
-    val formCompletado: Boolean = false,
-    val activado: Boolean = false,
-    val conectado: Boolean = false,
-    val rol: String = ""
+    var correo: String = "",
+    var nombre: String = "",
+    var apellidos: String = "",
+    var fecNac: String = "",
+    var formCompletado: Boolean = false,
+    var activo: Boolean = false,
+    var conectado: Boolean = false,
+    var rol: String = "",
+    var formulario: Formulario? = null
 )
 
 

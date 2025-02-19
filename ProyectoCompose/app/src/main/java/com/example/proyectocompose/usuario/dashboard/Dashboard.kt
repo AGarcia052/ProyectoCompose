@@ -65,13 +65,14 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
     val contexto = LocalContext.current
     val isLoading by dashboardVM.isLoading.collectAsState()
     var mostrarMenuPuntos by remember { mutableStateOf(false) }
-    val rol by dashboardVM.rol.collectAsState()
+    val usuario by dashboardVM.usuario.collectAsState()
     val opciones = listOf("Perfil", "Opciones de administrador", "Cerrar Sesión")
-    LaunchedEffect(rol) {
-        if (rol == "") {
-            dashboardVM.checkRol(loginVM.getCurrentEmail())
+    LaunchedEffect(usuario) {
+        if (usuario.rol.isEmpty()){
+            dashboardVM.cargarUsuario(loginVM.getCurrentEmail())
         }
     }
+
     TopAppBar(
         colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -107,16 +108,20 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
                 opciones = opciones,
                 onItemClick = { opcion ->
                     when (opcion) {
-                        "Perfil" -> navController.navigate(Rutas.perfil)
-                        "Opciones de administrador" -> navController.navigate(Rutas.adminPrincipal)
+                        "Perfil" -> navController.navigate(Rutas.perfil){
+                            popUpTo(Rutas.dashboard) { inclusive = false }
+                        }
+                        "Opciones de administrador" -> navController.navigate(Rutas.adminPrincipal){
+                            popUpTo(Rutas.dashboard) { inclusive = false }
+                        }
                         "Cerrar Sesión" -> {
                             loginVM.signOut(contexto)
-                            navController.navigate(Rutas.login)
+                            navController.popBackStack(Rutas.login, inclusive = false)
                         }
                     }
                 },
                 onDismiss = { mostrarMenuPuntos = false },
-                esAdministrador = { if (rol == "Administrador") true else false }
+                esAdministrador = { if (usuario!!.rol == "Administrador") true else false }
             )
         }
     )
@@ -183,7 +188,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
-            onClick = { navController.navigate(Rutas.usuariosAfines) },
+            onClick = { navController.navigate(Rutas.usuariosAfines){
+                popUpTo(Rutas.dashboard) { inclusive = false }
+            } },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -195,7 +202,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Rutas.amigos) },
+            onClick = { navController.navigate(Rutas.amigos) {
+                popUpTo(Rutas.dashboard) { inclusive = false }
+            }},
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -207,7 +216,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Rutas.quedadasUsuario) },
+            onClick = { navController.navigate(Rutas.quedadasUsuario){
+                popUpTo(Rutas.dashboard) { inclusive = false }
+            } },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()

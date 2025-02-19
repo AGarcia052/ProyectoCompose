@@ -100,7 +100,9 @@ fun BodyListaUsuarios(navController: NavController, loginViewModel: LoginViewMod
                 if (usuario.correo != loginViewModel.getCurrentEmail()){
                     ItemUsuario(usuario){
                         listaUsuariosViewModel.seleccionarUsuario(it)
-                        navController.navigate(Rutas.editarUsuario)
+                        navController.navigate(Rutas.editarUsuario){
+                            popUpTo(Rutas.usuariosAdmin) { inclusive = false }
+                        }
                     }
                 }
 
@@ -130,7 +132,7 @@ fun ItemUsuario(usuario: User, editar: (User) -> Unit){
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (usuario.activado){
+            if (usuario.activo){
                 Text(text = "Activo", color = Color.Green)
             }else{
                 Text(text = "Inactivo", color = Color.Red)

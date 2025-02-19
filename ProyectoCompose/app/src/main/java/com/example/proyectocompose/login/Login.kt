@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -47,9 +48,15 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
     var passwd by remember { mutableStateOf("") }
     val loginSuccess by loginViewModel.loginSuccess.collectAsState()
     val registerSuccess by loginViewModel.registerSuccess.collectAsState()
-    val loading by loginViewModel.isLoading.collectAsState()
+    val isLoading by loginViewModel.isLoading.collectAsState()
     var isRegistering by remember { mutableStateOf(false) }
     val activo by loginViewModel.userActivo.collectAsState()
+    val errorMessage by loginViewModel.errorMessage.collectAsState()
+
+    if(errorMessage.isNotEmpty()){
+        Toast.makeText(context,errorMessage,Toast.LENGTH_SHORT).show()
+        loginViewModel.resetErrorMessage()
+    }
 
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -81,7 +88,7 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
         if (loginSuccess) {
             loginViewModel.restart()
             navController.navigate(destino) {
-                popUpTo(Rutas.login) { inclusive = true }
+                popUpTo(Rutas.login) { inclusive = false }
             }
         }
     }
@@ -90,12 +97,12 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
         if (registerSuccess) {
             loginViewModel.restart()
             navController.navigate(Rutas.formulario) {
-                popUpTo(Rutas.formulario) { inclusive = true }
+                popUpTo(Rutas.formulario) { inclusive = false }
             }
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxSize().blur(if (isLoading) 8.dp else 0.dp), contentAlignment = Alignment.Center) {
 
         Column(
             modifier = Modifier
@@ -192,7 +199,7 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
 
         }
 
-        if (loading) {
+        if (isLoading) {
             CircularProgressIndicator()
         }
 
@@ -208,10 +215,7 @@ fun UsuarioNoActivo(navController: NavController){
         Text(text = "TU USARIO NO HA SIDO ACTIVADO.\nContacta con un administrador para activar tu cuenta")
         Spacer(modifier = Modifier.height(100.dp))
         Button(onClick = {
-
-            navController.navigate(Rutas.login){
-                popUpTo(Rutas.login) { inclusive = true }
-            }
+            navController.popBackStack(Rutas.login, inclusive = false)
 
         }) {
             Text(text="Volver")

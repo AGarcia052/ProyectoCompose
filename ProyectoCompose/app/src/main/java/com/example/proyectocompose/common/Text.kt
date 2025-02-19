@@ -14,12 +14,12 @@ import com.example.proyectocompose.ui.theme.ProyectoComposeTheme
 
 @Composable
 fun TitleText(text: String) {
-    Text(text = text, fontWeight = FontWeight.Bold, fontSize = 40.sp)
+    Text(text = text, fontWeight = FontWeight.Bold, fontSize = 30.sp, textDecoration = TextDecoration.Underline)
 }
 
 @Composable
 fun Subtitle(text: String) {
-    Text(text = text, fontWeight = FontWeight.Bold, fontSize = 30.sp, lineHeight = 40.sp)
+    Text(text = text, fontWeight = FontWeight.Bold, fontSize = 25.sp, lineHeight = 40.sp)
 }
 
 @Composable

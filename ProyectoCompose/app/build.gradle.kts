@@ -67,6 +67,12 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.play.services.auth)
     //implementation (libs.androidx.foundation.pager)
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation(libs.coil.compose)
+
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose.v2112)
+    implementation(libs.play.services.location)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
 
 }
