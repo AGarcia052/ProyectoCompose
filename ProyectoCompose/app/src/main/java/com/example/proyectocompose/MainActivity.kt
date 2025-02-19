@@ -22,6 +22,10 @@ import com.example.proyectocompose.administrador.quedadas.EditarQuedada
 import com.example.proyectocompose.administrador.quedadas.QuedadasAdmin
 import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQuedadaViewModel
 import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
+import com.example.proyectocompose.usuario.amigos.ListaAmigos
+import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
+import com.example.proyectocompose.usuario.chat.Chat
+import com.example.proyectocompose.usuario.chat.ChatViewModel
 import com.example.proyectocompose.usuario.dashboard.Dashboard
 import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 import com.example.proyectocompose.usuario.dashboard.perfil.Perfil
@@ -31,6 +35,8 @@ class MainActivity : ComponentActivity() {
     val loginViewModel = LoginViewModel()
     val dashboardViewModel = DashboardViewModel()
     val listaUsuariosViewModel = ListaUsuariosViewModel()
+    val listaAmigosViewModel = ListaAmigosViewModel()
+    val chatViewModel = ChatViewModel()
     val perfilViewModel = PerfilViewModel()
     val quedadasAdminViewModel = QuedadasAdminViewModel()
     val mapsAdminQuedadaViewModel = MapsAdminQuedadaViewModel()
@@ -78,6 +84,12 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Rutas.editarQuedada){
                         EditarQuedada(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
+                    }
+                    composable(Rutas.amigos){
+                        ListaAmigos(navController = navController, loginViewModel = loginViewModel, listaAmigosViewModel = listaAmigosViewModel)
+                    }
+                    composable(Rutas.chat) {
+                        Chat(navController = navController,loginViewModel = loginViewModel,listaAmigosViewModel = listaAmigosViewModel,chatViewModel = chatViewModel)
                     }
                 }
             }

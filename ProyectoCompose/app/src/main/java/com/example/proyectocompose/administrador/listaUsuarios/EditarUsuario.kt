@@ -121,7 +121,7 @@ fun BodyEditarUsuario(navController: NavController, listaUsuariosViewModel: List
                 if (usuarioAEditar!!.rol != listaUsuariosViewModel.rol.value){
                     listaUsuariosViewModel.cambiarRolUsuario(listaUsuariosViewModel.rol.value)
                 }
-                listaUsuariosViewModel.desseleccionarUsuario()
+                //listaUsuariosViewModel.desseleccionarUsuario()
                 listaUsuariosViewModel.cargarUsuarios()
                 navController.popBackStack(Rutas.usuariosAdmin, inclusive = false)
             }) {

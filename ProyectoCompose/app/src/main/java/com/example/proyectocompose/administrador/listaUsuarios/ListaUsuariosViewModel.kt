@@ -74,6 +74,7 @@ class ListaUsuariosViewModel:ViewModel() {
                 val listaUsuarios = mutableListOf<User>()
                 for (document in result) {
                     val usuario = document.toObject(User::class.java)
+                    usuario.activo = document.getBoolean("activado") ?: false
                     listaUsuarios.add(usuario)
                 }
                 _usuarios.value = listaUsuarios
