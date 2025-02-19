@@ -40,10 +40,13 @@ class ListaAmigosViewModel: ViewModel() {
         _usuarioSeleccionado.value = usuario
     }
 
+
+
     fun cargarUsuarios(currentUser: String) {
         db.collection(Colecciones.usuarios).document(currentUser)
             .get()
             .addOnSuccessListener { result ->
+                Log.d(TAG, "Result: $result")
                 val listaUsuarios = mutableListOf<Amigo>()
                 var usuariosConectados = 0
                 val tareasPendientes = mutableListOf<Task<*>>()
@@ -53,6 +56,7 @@ class ListaAmigosViewModel: ViewModel() {
                         val tareaUsuario = db.collection(Colecciones.usuarios).document(correoAmigo)
                             .get()
                             .continueWithTask { task ->
+                                Log.d(TAG, "Correo amigo: $correoAmigo")
                                 if (!task.isSuccessful || task.result == null) {
                                     throw task.exception ?: Exception("Error al obtener usuario")
                                 }
@@ -72,6 +76,7 @@ class ListaAmigosViewModel: ViewModel() {
                                     storageRef.child("images/${usuario.correo}/perfil")
                                         .downloadUrl
                                         .addOnSuccessListener { uri ->
+                                            Log.d(TAG, "URI: $uri")
                                             usuario.foto = uri.toString()
                                         }
                                         .addOnFailureListener {
@@ -79,15 +84,19 @@ class ListaAmigosViewModel: ViewModel() {
                                         }
 
                                 val tareaMensajes = database.child(Colecciones.mensajes)
-                                    .orderByChild("sender").equalTo(usuario.correo)
-                                    .orderByChild("reciever").equalTo(currentUser)
-                                    .orderByChild("leido").equalTo(false)
+                                    .orderByChild("sender")
+                                    .equalTo(usuario.correo)
                                     .get()
                                     .addOnSuccessListener { snapshot ->
-                                        usuario.mensajesSinLeer = snapshot.children.count()
+                                        val mensajesFiltrados = snapshot.children.filter {
+                                            it.child("reciever").getValue(String::class.java) == currentUser &&
+                                            it.child("leido").getValue(Boolean::class.java) == false
+                                        }
+                                        usuario.mensajesSinLeer = mensajesFiltrados.size
+                                        Log.d(TAG, "Mensajes filtrados: ${mensajesFiltrados.size}")
                                     }
                                     .addOnFailureListener {
-                                        Log.e(TAG,"Error al cargar los mensajes: ${it.message}")
+                                        Log.e(TAG, "Error al cargar los mensajes: ${it.message}")
                                     }
 
                                 Tasks.whenAllComplete(tareaImagen, tareaMensajes)

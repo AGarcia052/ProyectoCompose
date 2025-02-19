@@ -20,48 +20,27 @@ class ChatViewModel: ViewModel() {
     private val databaseReference = FirebaseDatabase.getInstance().getReference(Colecciones.mensajes)
 
     fun observeMessages(usuario1: String, usuario2: String) {
-        val mensajesList = mutableListOf<Mensaje>()
-        var consultasCompletadas = 0
-
-        databaseReference.orderByChild("sender").equalTo(usuario1)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
+        databaseReference
+            .orderByChild("sender")
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    val mensajesList = mutableListOf<Mensaje>()
+
                     for (mensajeSnapshot in snapshot.children) {
                         val mensaje = mensajeSnapshot.getValue(Mensaje::class.java)
-                        mensaje?.leido = true
-                        if (mensaje?.reciever == usuario2) {
+
+                        if (mensaje != null && ((mensaje.sender == usuario1 && mensaje.reciever == usuario2) ||
+                                    (mensaje.sender == usuario2 && mensaje.reciever == usuario1))) {
                             mensajesList.add(mensaje)
                         }
                     }
-                    consultasCompletadas++
-                    if (consultasCompletadas == 2) {
-                        mensajesList.sortBy { it.fechaYHora }
-                        _mensajes.value = mensajesList
-                    }
+
+                    mensajesList.sortByDescending { it.fechaYHora }
+                    _mensajes.value = mensajesList.toList()
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("Firebase", "Error en consulta 1: ${error.message}")
-                }
-            })
-        databaseReference.orderByChild("sender").equalTo(usuario2)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (mensajeSnapshot in snapshot.children) {
-                        val mensaje = mensajeSnapshot.getValue(Mensaje::class.java)
-                        if (mensaje?.reciever == usuario1) {
-                            mensajesList.add(mensaje)
-                        }
-                    }
-                    consultasCompletadas++
-                    if (consultasCompletadas == 2) {
-                        mensajesList.sortBy { it.fechaYHora }
-                        _mensajes.value = mensajesList
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("Firebase", "Error en consulta 2: ${error.message}")
+                    Log.e(TAG, "Error al observar mensajes: ${error.message}")
                 }
             })
     }
