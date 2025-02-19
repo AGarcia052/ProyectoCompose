@@ -48,46 +48,57 @@ class ListaAmigosViewModel: ViewModel() {
                 var usuariosConectados = 0
                 val tareasPendientes = mutableListOf<Task<*>>()
 
-                for (correoAmigo in result["amigos"] as List<String>) {
-                    val tareaUsuario = db.collection(Colecciones.usuarios).document(correoAmigo)
-                        .get()
-                        .continueWithTask { task ->
-                            if (!task.isSuccessful || task.result == null) {
-                                throw task.exception ?: Exception("Error al obtener usuario")
+                if (result["amigos"] != null) {
+                    for (correoAmigo in result["amigos"] as List<String>) {
+                        val tareaUsuario = db.collection(Colecciones.usuarios).document(correoAmigo)
+                            .get()
+                            .continueWithTask { task ->
+                                if (!task.isSuccessful || task.result == null) {
+                                    throw task.exception ?: Exception("Error al obtener usuario")
+                                }
+                                val document = task.result!!
+
+                                val usuario = Amigo(
+                                    document["correo"].toString(),
+                                    document["nombre"].toString(),
+                                    document["apellidos"].toString(),
+                                    document["conectado"] as Boolean
+                                )
+                                if (usuario.conectado) {
+                                    usuariosConectados++
+                                }
+
+                                val tareaImagen =
+                                    storageRef.child("images/${usuario.correo}/perfil")
+                                        .downloadUrl
+                                        .addOnSuccessListener { uri ->
+                                            usuario.foto = uri.toString()
+                                        }
+                                        .addOnFailureListener {
+                                            Log.e(TAG,"Error al cargar la imagen: ${it.message}")
+                                        }
+
+                                val tareaMensajes = database.child(Colecciones.mensajes)
+                                    .orderByChild("sender").equalTo(usuario.correo)
+                                    .orderByChild("reciever").equalTo(currentUser)
+                                    .orderByChild("leido").equalTo(false)
+                                    .get()
+                                    .addOnSuccessListener { snapshot ->
+                                        usuario.mensajesSinLeer = snapshot.children.count()
+                                    }
+                                    .addOnFailureListener {
+                                        Log.e(TAG,"Error al cargar los mensajes: ${it.message}")
+                                    }
+
+                                Tasks.whenAllComplete(tareaImagen, tareaMensajes)
+                                    .addOnSuccessListener {
+                                        listaUsuarios.add(usuario)
+                                    }
                             }
-                            val document = task.result!!
 
-                            val usuario = Amigo(
-                                document["correo"].toString(),
-                                document["nombre"].toString(),
-                                document["apellidos"].toString(),
-                                document["conectado"] as Boolean
-                            )
-                            if (usuario.conectado) {
-                                usuariosConectados++
-                            }
-
-                            val tareaImagen = storageRef.child("images/${usuario.correo}/perfil")
-                                .downloadUrl
-                                .addOnSuccessListener { uri -> usuario.foto = uri.toString() }
-                                .addOnFailureListener { Log.e(TAG, "Error al cargar la imagen: ${it.message}") }
-
-                            val tareaMensajes = database.child(Colecciones.mensajes)
-                                .orderByChild("sender").equalTo(usuario.correo)
-                                .orderByChild("reciever").equalTo(currentUser)
-                                .orderByChild("leido").equalTo(false)
-                                .get()
-                                .addOnSuccessListener { snapshot -> usuario.mensajesSinLeer = snapshot.children.count() }
-                                .addOnFailureListener { Log.e(TAG, "Error al cargar los mensajes: ${it.message}") }
-
-                            Tasks.whenAllComplete(tareaImagen, tareaMensajes).addOnSuccessListener {
-                                listaUsuarios.add(usuario)
-                            }
-                        }
-
-                    tareasPendientes.add(tareaUsuario)
+                        tareasPendientes.add(tareaUsuario)
+                    }
                 }
-
                 Tasks.whenAllComplete(tareasPendientes).addOnSuccessListener {
                     _usuarios.value = listaUsuarios
                     _numAmigos.value = listaUsuarios.size
@@ -96,5 +107,4 @@ class ListaAmigosViewModel: ViewModel() {
             }
             .addOnFailureListener { Log.e(TAG, "Error al cargar el usuario actual: ${it.message}") }
     }
-
 }

@@ -196,7 +196,7 @@ class LoginViewModel: ViewModel() {
                 val datos = result.data
                 datos?.let {
                     formCompletado = datos["formCompletado"] as Boolean
-                    activo = datos["activo"] as Boolean?
+                    activo = datos["activado"] as Boolean?
                     Log.e(Constantes.TAG, "LOGINVW: FORM COMPLETADO: $formCompletado")
                     if (formCompletado){
                         if(activo != null){

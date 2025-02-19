@@ -138,7 +138,7 @@ fun BodyChat(loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosVi
             Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
                 if (inputMessage.isNotBlank()) {
-                    chatViewModel.sendMessage(loginViewModel.getCurrentEmail(), inputMessage)
+                    chatViewModel.sendMessage(loginViewModel.getCurrentEmail(), listaAmigosViewModel.usuarioSeleccionado.value!!.correo, inputMessage)
                     inputMessage = ""
                 }
             }) {
