@@ -29,6 +29,8 @@ class FormularioViewModel: ViewModel(){
     val apellidos = MutableStateFlow("")
     val fecNac = MutableStateFlow("")
     val correo = MutableStateFlow("")
+    val sexo = MutableStateFlow("")
+    val descripcion = MutableStateFlow("")
     //FORMULARIO
     val relacionSeria = MutableStateFlow(false)
     val deportes = MutableStateFlow(50)
@@ -56,6 +58,7 @@ class FormularioViewModel: ViewModel(){
     fun completarRegistro(context: Context){
 
         val form = mapOf(
+            "sexo" to sexo.value,
             "relacionSeria" to relacionSeria.value,
             "deportes" to deportes.value,
             "arte" to arte.value,
@@ -69,6 +72,7 @@ class FormularioViewModel: ViewModel(){
             "nombre" to nombre.value,
             "apellidos" to apellidos.value,
             "fecNac" to fecNac.value,
+            "descripcion" to descripcion.value,
             "correo" to correo.value,
             "formCompletado" to true,
             "rol" to "USUARIO",
