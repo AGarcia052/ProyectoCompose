@@ -24,12 +24,15 @@ import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQu
 import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
 import com.example.proyectocompose.usuario.amigos.ListaAmigos
 import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
+import com.example.proyectocompose.usuario.buscarAfines.UsuariosAfines
+import com.example.proyectocompose.usuario.buscarAfines.UsuariosAfinesViewModel
 import com.example.proyectocompose.usuario.chat.Chat
 import com.example.proyectocompose.usuario.chat.ChatViewModel
 import com.example.proyectocompose.usuario.dashboard.Dashboard
 import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 import com.example.proyectocompose.usuario.dashboard.perfil.Perfil
 import com.example.proyectocompose.usuario.dashboard.perfil.PerfilViewModel
+import com.example.proyectocompose.utils.Rutas
 
 class MainActivity : ComponentActivity() {
     val loginViewModel = LoginViewModel()
@@ -40,6 +43,7 @@ class MainActivity : ComponentActivity() {
     val perfilViewModel = PerfilViewModel()
     val quedadasAdminViewModel = QuedadasAdminViewModel()
     val mapsAdminQuedadaViewModel = MapsAdminQuedadaViewModel()
+    val usuariosAfinesViewModel = UsuariosAfinesViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -90,6 +94,12 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Rutas.chat) {
                         Chat(navController = navController,loginViewModel = loginViewModel,listaAmigosViewModel = listaAmigosViewModel,chatViewModel = chatViewModel)
+                    }
+                    composable(Rutas.usuariosAfines){
+                        UsuariosAfines(
+                            viewModel = usuariosAfinesViewModel, navController = navController,
+                            dashboardViewModel = dashboardViewModel
+                        )
                     }
                 }
             }

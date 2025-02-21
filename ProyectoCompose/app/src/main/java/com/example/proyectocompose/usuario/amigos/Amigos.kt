@@ -2,14 +2,11 @@ package com.example.proyectocompose.usuario.amigos
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,11 +44,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
-import com.example.proyectocompose.administrador.listaUsuarios.ListaUsuariosViewModel
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.model.Amigo
-import com.example.proyectocompose.model.User
 
 @Composable
 fun ListaAmigos(navController: NavController, loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel){

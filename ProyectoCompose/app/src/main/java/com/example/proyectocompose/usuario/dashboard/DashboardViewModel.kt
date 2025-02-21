@@ -1,21 +1,14 @@
 package com.example.proyectocompose.usuario.dashboard
 
-import android.content.Context
-import android.net.Uri
 import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
+import com.example.proyectocompose.utils.Colecciones
 import com.example.proyectocompose.model.Formulario
 import com.example.proyectocompose.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import com.google.firebase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.io.File
 
 class DashboardViewModel:ViewModel() {
     val TAG = "AMIGOSAPP"

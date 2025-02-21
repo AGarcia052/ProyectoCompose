@@ -2,7 +2,6 @@ package com.example.proyectocompose.administrador.quedadas
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -48,7 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.administrador.quedadas.componentes.SeleccionarFecha
 import com.example.proyectocompose.administrador.quedadas.componentes.SeleccionarUbicacion
 import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQuedadaViewModel

@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.model.User
 
