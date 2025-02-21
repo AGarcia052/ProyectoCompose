@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
+import com.example.proyectocompose.utils.Colecciones
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
@@ -55,7 +55,7 @@ class FormularioViewModel: ViewModel(){
 
     fun completarRegistro(context: Context){
 
-        var form = mapOf(
+        val form = mapOf(
             "relacionSeria" to relacionSeria.value,
             "deportes" to deportes.value,
             "arte" to arte.value,
@@ -65,7 +65,7 @@ class FormularioViewModel: ViewModel(){
             "interesSexual" to interesSexual.value
         )
 
-        var user = mapOf(
+        val user = mapOf(
             "nombre" to nombre.value,
             "apellidos" to apellidos.value,
             "fecNac" to fecNac.value,
@@ -74,7 +74,9 @@ class FormularioViewModel: ViewModel(){
             "rol" to "USUARIO",
             "activo" to false,
             "conectado" to false,
-            "formulario" to form
+            "formulario" to form,
+            "amigos" to listOf<String>(),
+            "usuariosConLike" to listOf<String>()
         )
 
         db.collection(Colecciones.usuarios)

@@ -2,9 +2,8 @@ package com.example.proyectocompose.usuario.chat
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
-import com.example.proyectocompose.Constantes.TAG
-import com.example.proyectocompose.model.Amigo
+import com.example.proyectocompose.utils.Colecciones
+import com.example.proyectocompose.utils.Constantes.TAG
 import com.example.proyectocompose.model.Mensaje
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

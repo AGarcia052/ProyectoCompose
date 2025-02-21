@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -41,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
 @Composable
 fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM: DashboardViewModel){

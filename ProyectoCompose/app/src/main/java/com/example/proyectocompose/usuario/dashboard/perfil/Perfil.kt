@@ -65,7 +65,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.proyectocompose.BuildConfig
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.common.ComboBox
 import com.example.proyectocompose.login.DatePickerEdad
 import com.example.proyectocompose.login.SliderPreference

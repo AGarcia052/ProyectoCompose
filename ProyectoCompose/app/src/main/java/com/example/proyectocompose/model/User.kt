@@ -9,7 +9,9 @@ data class User(
     var activo: Boolean = false,
     var conectado: Boolean = false,
     var rol: String = "",
-    var formulario: Formulario? = null
+    var formulario: Formulario? = null, //cambiar a vacio
+    var amigos: List<String> = emptyList(),
+    var usuariosConLike: List<String> = emptyList()
 )
 
 

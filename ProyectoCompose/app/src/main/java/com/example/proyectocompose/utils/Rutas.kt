@@ -1,4 +1,4 @@
-package com.example.proyectocompose
+package com.example.proyectocompose.utils
 
 object Rutas {
     val login = "Login"

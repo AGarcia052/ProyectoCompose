@@ -1,4 +1,4 @@
-package com.example.proyectocompose
+package com.example.proyectocompose.utils
 
 object Colecciones {
     val usuarios = "usuarios"

@@ -5,10 +5,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
-import com.example.proyectocompose.Constantes
+import com.example.proyectocompose.utils.Colecciones
+import com.example.proyectocompose.utils.Constantes
 import com.example.proyectocompose.model.Quedada
-import com.example.proyectocompose.model.User
 import com.example.proyectocompose.model.UserQuedada
 import com.example.proyectocompose.utils.toCustomString
 import com.google.android.gms.maps.model.LatLng
