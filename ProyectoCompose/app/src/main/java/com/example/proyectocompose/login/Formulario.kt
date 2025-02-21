@@ -163,11 +163,12 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
     val interesSexual by viewModel.interesSexual.collectAsState()
     val imageUri by viewModel.imageUri.observeAsState(Uri.EMPTY)
     val imageFile by viewModel.imageFile.observeAsState(null)
+    val descripcion by viewModel.descripcion.collectAsState()
     val uploadSuccess by viewModel.uploadSuccess.observeAsState()
     var btnEnabled by remember {
         mutableStateOf(false)
     }
-    btnEnabled = nombre.trim().isNotEmpty()  && apellidos.trim().isNotEmpty() && fecNac.isNotEmpty() && interesSexual.trim().isNotEmpty()
+    btnEnabled = nombre.trim().isNotEmpty()  && apellidos.trim().isNotEmpty() && fecNac.isNotEmpty() && interesSexual.trim().isNotEmpty() && imageUri != Uri.EMPTY
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
@@ -223,6 +224,16 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
             Spacer(modifier = Modifier.height(10.dp))
 
             DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
+            Spacer(modifier = Modifier.height(10.dp))
+            ComboBox(listOf("Hombre","Mujer")) { viewModel.sexo.value = it }
+            Spacer(modifier = Modifier.height(20.dp))
+            TextField(
+                value = descripcion,
+                onValueChange = { viewModel.descripcion.value = it },
+                placeholder = { Text("Ingresa la descripción aquí") },
+                maxLines = 5,
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(text = "Imagen de perfil: ", modifier = Modifier.padding(bottom = 10.dp))
