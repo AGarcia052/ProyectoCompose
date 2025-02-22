@@ -60,6 +60,9 @@ class DashboardViewModel:ViewModel() {
                     _usuario.value.conectado = datos["conectado"] as Boolean
                     _usuario.value.activo = datos["activo"] as Boolean
                     _usuario.value.formCompletado = datos["formCompletado"] as Boolean
+                    _usuario.value.usuariosConLike = datos["usuariosConLike"] as List<String>
+                    _usuario.value.amigos = datos["amigos"] as List<String>
+                    _usuario.value.descripcion = datos["descripcion"] as String
                     val formulario = datos["formulario"] as Map<*, *>
                     formulario.let{
                         _usuario.value.formulario = Formulario(
