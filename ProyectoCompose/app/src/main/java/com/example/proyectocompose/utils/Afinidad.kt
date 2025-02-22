@@ -76,7 +76,12 @@ object Afinidad {
         // Candidato quiere hijos pero usuario no
         val casoCuatro = quiereHijos(formCandidato.quiereHijos && !formUsuario.quiereHijos)
 
-        return casoUno + casoDos + casoTres + casoCuatro
+        val totalTiene =(casoUno + casoDos)/2
+
+        val totalQuiere = (casoTres + casoCuatro)/2
+        Log.d(Constantes.TAG,"TOTAL TIENE: $totalTiene, TOTAL QUIERE: $totalQuiere")
+
+        return  totalTiene+ totalQuiere
 
 
     }
@@ -140,12 +145,13 @@ object Afinidad {
      **/
 
     private fun parteGustos(formUsuario: Formulario, formCandidato: Formulario): Double{
-        val politica = calcAfinidadGustos(formUsuario.politica,formCandidato.politica)
-        val arte = calcAfinidadGustos(formUsuario.arte,formCandidato.arte)
-        val deporte = calcAfinidadGustos(formUsuario.deportes,formCandidato.deportes)
+        val politica = calcAfinidadGustos(formUsuario.politica,formCandidato.politica)/3
+        val arte = calcAfinidadGustos(formUsuario.arte,formCandidato.arte)/3
+        val deporte = calcAfinidadGustos(formUsuario.deportes,formCandidato.deportes)/3
 
+        Log.d(Constantes.TAG,"Politica: $politica, Arte: $arte, Deporte: $deporte")
 
-        return (politica+arte+deporte)/3
+        return (politica+arte+deporte)
     }
 
     private fun calcAfinidadGustos(numUsuario: Int, numCandidato: Int): Double {
