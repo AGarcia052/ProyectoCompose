@@ -1,5 +1,6 @@
 package com.example.proyectocompose.utils
 
+import android.util.Log
 import com.example.proyectocompose.model.Formulario
 import com.example.proyectocompose.model.User
 import kotlin.math.abs
@@ -24,8 +25,8 @@ object Afinidad {
 
     fun calcularAfinidad(usuario: User, candidato: User): Boolean {
 
-        val formUsuario = usuario.formulario!!
-        val formCandidato = candidato.formulario!!
+        val formUsuario = usuario.formulario
+        val formCandidato = candidato.formulario
 
 
         val parteInteresSexual =
@@ -38,7 +39,10 @@ object Afinidad {
         hijos = 0.0
         gustos = 0.0
 
-        return scoreFinal >= 6.5
+
+        val resultado = scoreFinal >= 6.5
+        Log.i(Constantes.TAG,"Algoritmo afinidad: RESULTADO DE AFINIDAD: ${scoreFinal},${resultado}")
+        return resultado
 
     }
 
@@ -141,7 +145,7 @@ object Afinidad {
         val deporte = calcAfinidadGustos(formUsuario.deportes,formCandidato.deportes)
 
 
-        return politica+arte+deporte
+        return (politica+arte+deporte)/3
     }
 
     private fun calcAfinidadGustos(numUsuario: Int, numCandidato: Int): Double {

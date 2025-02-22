@@ -160,13 +160,13 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
             usuarioInicial.nombre != nombre.value ||
                     usuarioInicial.apellidos != apellidos.value ||
                     usuarioInicial.fecNac != fecnac.value ||
-                    usuarioInicial.formulario?.relacionSeria != relacionSeria.value ||
-                    usuarioInicial.formulario?.deportes != deportes.intValue ||
-                    usuarioInicial.formulario?.arte != arte.intValue ||
-                    usuarioInicial.formulario?.politica != politica.intValue ||
-                    usuarioInicial.formulario?.tieneHijos != tieneHijos.value ||
-                    usuarioInicial.formulario?.quiereHijos != quiereHijos.value ||
-                    usuarioInicial.formulario?.interesSexual != interesSexual.value
+                    usuarioInicial.formulario.relacionSeria != relacionSeria.value ||
+                    usuarioInicial.formulario.deportes != deportes.intValue ||
+                    usuarioInicial.formulario.arte != arte.intValue ||
+                    usuarioInicial.formulario.politica != politica.intValue ||
+                    usuarioInicial.formulario.tieneHijos != tieneHijos.value ||
+                    usuarioInicial.formulario.quiereHijos != quiereHijos.value ||
+                    usuarioInicial.formulario.interesSexual != interesSexual.value
         }
     }
 
