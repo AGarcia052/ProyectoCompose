@@ -9,6 +9,7 @@ import com.example.proyectocompose.model.Formulario
 import com.example.proyectocompose.model.User
 import com.example.proyectocompose.utils.Afinidad
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
@@ -35,11 +36,6 @@ class UsuariosAfinesViewModel : ViewModel() {
     private val _usuario = MutableStateFlow<User>(User())
     val usuario: StateFlow<User> get() = _usuario
 
-//    private val _listaAmigos = MutableStateFlow<List<User>>(listOf())
-//    val listaAmigos: StateFlow<List<User>> get() = _listaAmigos
-//
-//    private val _usuariosConLike = MutableStateFlow<List<User>>(listOf())
-//    val usuariosConLike: StateFlow<List<User>> get() = _usuariosConLike
 
     private val _usrNoAmigos = MutableStateFlow<List<User>>(listOf())
 
@@ -130,6 +126,7 @@ class UsuariosAfinesViewModel : ViewModel() {
 
             if(!filtrar){
                 _candidatosDescartados.value = emptyList()
+                _candidatos.value = emptyList()
             }
 
             getNoAmigos()
@@ -149,8 +146,7 @@ class UsuariosAfinesViewModel : ViewModel() {
                     tempList.add(usr)
                 }
 
-                _candidatos.value = tempList.toList()
-
+                _candidatos.value = tempList.filterNot { it in _candidatosDescartados.value }
             }
 
 
@@ -167,56 +163,69 @@ class UsuariosAfinesViewModel : ViewModel() {
 
         val candidatoLikeado = _candidatos.value.find {candidato: User -> candidato.correo == correo }
 
-        candidatoLikeado?.let { candidato ->
-            val yaTieneLike = candidato.usuariosConLike.contains(_usuario.value.correo)
+        val yaTieneLike = candidatoLikeado!!.usuariosConLike.contains(_usuario.value.correo)
 
-            if (yaTieneLike) {
-                val nuevosAmigosCandidato = candidato.amigos + _usuario.value.correo
-                val nuevosUsuariosConLikeCandidato = candidato.usuariosConLike - _usuario.value.correo
+        if(yaTieneLike){
 
-                val nuevoCandidato = candidato.copy(
-                    amigos = nuevosAmigosCandidato,
-                    usuariosConLike = nuevosUsuariosConLikeCandidato
-                )
+            //CANDIDATO
+            val nuevosAmigosCandidato = candidatoLikeado.amigos + _usuario.value.correo
+            val nuevosUsuariosConLikeCandidato = candidatoLikeado.usuariosConLike - _usuario.value.correo
 
-                val nuevosAmigosUsuario = _usuario.value.amigos + correo
-                val nuevoUsuario = _usuario.value.copy(amigos = nuevosAmigosUsuario)
+            _candidatos.value = _candidatos.value.filterNot { it.correo == correo }
+            _profileImg.value = ""
 
-                _candidatos.value = _candidatos.value.map {
-                    if (it.correo == correo) nuevoCandidato else it
+            db.collection(Colecciones.usuarios)
+                .document(correo)
+                .update("amigos",nuevosAmigosCandidato)
+                .addOnSuccessListener {  }
+                .addOnFailureListener {  }
+
+            db.collection(Colecciones.usuarios)
+                .document(correo)
+                .update("usuariosConLike",nuevosUsuariosConLikeCandidato)
+                .addOnSuccessListener {  }
+                .addOnFailureListener {  }
+
+            //USUARIO
+
+            val nuevosAmigosUsuario = _usuario.value.amigos + correo
+            val nuevosLikesUsuario = _usuario.value.usuariosConLike.filterNot { it == correo }
+            val nuevoUsuario = _usuario.value.copy(amigos = nuevosAmigosUsuario, usuariosConLike = nuevosLikesUsuario)
+            _usuario.value = nuevoUsuario
+
+            db.collection(Colecciones.usuarios)
+                .document(_usuario.value.correo)
+                .update("amigos",FieldValue.arrayUnion(correo))
+                .addOnSuccessListener {  }
+                .addOnFailureListener {  }
+            db.collection(Colecciones.usuarios)
+                .document(_usuario.value.correo)
+                .update("usuariosConLike",nuevosLikesUsuario)
+                .addOnSuccessListener {  }
+                .addOnFailureListener {  }
+
+        }else {
+
+            val nuevosUsuariosConLikeUsuario = _usuario.value.usuariosConLike + correo
+
+            _usuario.value = _usuario.value.copy(usuariosConLike = nuevosUsuariosConLikeUsuario)
+
+            db.collection(Colecciones.usuarios)
+                .document(_usuario.value.correo)
+                .update("usuariosConLike", FieldValue.arrayUnion(correo))
+                .addOnSuccessListener {
+
+                    Log.i(Constantes.TAG,"Candidato ${correo} añadido a likeados")
+                    _candidatos.value = _candidatos.value.filterNot { it.correo == correo }
+                    _profileImg.value = ""
+                    obtenerPerfilImg()
+
                 }
+                .addOnFailureListener {error ->
+                    Log.e(Constantes.TAG,"Error al añadir candidato a likeados\n$error")
 
-                _candidatos.value = _candidatos.value.filterNot { it.correo == correo }
-
-
-                _usuario.value = nuevoUsuario
-            } else {
-
-                val nuevosUsuariosConLikeUsuario = _usuario.value.usuariosConLike + correo
-
-                _usuario.value = _usuario.value.copy(usuariosConLike = nuevosUsuariosConLikeUsuario)
-
-                db.collection(Colecciones.usuarios)
-                    .document(_usuario.value.correo)
-                    .update("usuariosConLike",_usuario.value.usuariosConLike)
-                    .addOnSuccessListener {
-
-                        Log.i(Constantes.TAG,"Candidato ${correo} añadido a likeados")
-                        _candidatos.value = _candidatos.value.filterNot { it.correo == correo }
-                        _profileImg.value = ""
-                        obtenerPerfilImg()
-
-
-                    }
-                    .addOnFailureListener {error ->
-                        Log.e(Constantes.TAG,"Error al añadir candidato a likeados\n$error")
-
-                    }
-            }
+                }
         }
-
-
-
 
         checkHayCandidatos()
     }
@@ -227,45 +236,37 @@ class UsuariosAfinesViewModel : ViewModel() {
         val candidato = _candidatos.value.find { candidato -> candidato.correo == correo }
 
         _candidatos.value -= candidato!!
+        _profileImg.value = ""
 
         checkHayCandidatos()
-        _profileImg.value = ""
         obtenerPerfilImg()
     }
 
     private suspend fun getNoAmigos() {
 
-        val results: QuerySnapshot?
+        val results: QuerySnapshot = db.collection(Colecciones.usuarios)
+                .whereEqualTo("activo", true)
+                .get()
+                .await()
 
-        if(_usuario.value.amigos.isNotEmpty() && _usuario.value.usuariosConLike.isNotEmpty()){
-            results = db.collection(Colecciones.usuarios)
-                .whereNotIn("correo", _usuario.value.amigos)
-                .whereNotIn("correo",_usuario.value.usuariosConLike)
-                .whereEqualTo("activo", true)
-                //.whereNotEqualTo("correo",_usuario.value.correo)
-                .get()
-                .await()
-        }else if(_usuario.value.usuariosConLike.isNotEmpty()){
-            results = db.collection(Colecciones.usuarios)
-                .whereEqualTo("activo", true)
-                .whereNotEqualTo("correo",_usuario.value.correo)
-                .whereNotIn("correo",_usuario.value.usuariosConLike)
-                .get()
-                .await()
-        }else if(_usuario.value.amigos.isNotEmpty()){
-            results = db.collection(Colecciones.usuarios)
-                .whereEqualTo("activo", true)
-                //.whereNotEqualTo("correo",_usuario.value.correo)
-                .whereNotIn("correo",_usuario.value.amigos)
-                .get()
-                .await()
-        }else{
-            results = db.collection(Colecciones.usuarios)
-                .whereEqualTo("activo", true)
-                //.whereNotEqualTo("correo",_usuario.value.correo)
-                .get()
-                .await()
-        }
+        val amigosMasLikes = (_usuario.value.amigos + _usuario.value.usuariosConLike).filter { it != _usuario.value.correo }
+
+
+        //EVITAR USO DE INDICES
+
+//        results = if(_usuario.value.amigos.isNotEmpty() || _usuario.value.usuariosConLike.isNotEmpty()){
+//            db.collection(Colecciones.usuarios)
+//                .whereNotIn("correo", amigosMasLikes)
+//                .whereEqualTo("activo", true)
+//                .get()
+//                .await()
+//
+//        }else{
+//            db.collection(Colecciones.usuarios)
+//                .whereEqualTo("activo", true)
+//                .get()
+//                .await()
+//        }
 
 
         val todos = results.documents.mapNotNull { document ->
@@ -294,10 +295,25 @@ class UsuariosAfinesViewModel : ViewModel() {
             )
         }
 
-        val quitar = todos.find { user -> user.correo == _usuario.value.correo }!!
+        val quitar = todos.filterNot { user -> user.correo == _usuario.value.correo }
 
-        _usrNoAmigos.value = todos - quitar
-        _usrNoAmigos.value -= _candidatosDescartados.value
+        if(_usuario.value.amigos.isNotEmpty() || _usuario.value.usuariosConLike.isNotEmpty()){
+            val temp = arrayListOf<User>()
+            for(candidato in quitar){
+
+                if ((amigosMasLikes.find {correo -> correo == candidato.correo } == null)){
+
+                    temp.add(candidato)
+                }
+            }
+            _usrNoAmigos.value = temp.toList()
+
+        }else{
+            _usrNoAmigos.value = quitar
+        }
+
+
+
         Log.i(Constantes.TAG, "usrAfinesVW: Candidatos obtenidos")
     }
 
