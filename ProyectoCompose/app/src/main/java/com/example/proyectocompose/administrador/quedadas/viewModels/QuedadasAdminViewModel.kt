@@ -48,7 +48,7 @@ class QuedadasAdminViewModel : ViewModel() {
     private val _usuariosObtenidos = MutableStateFlow<Boolean>(false)
     val usuariosObtenidos: StateFlow<Boolean> get() = _usuariosObtenidos
 
-    fun restart(){
+    fun restart() {
         _usuariosObtenidos.value = false
         _usuariosElegidos.value = emptyList()
         _usuariosDisponibles.value = emptyList()
@@ -56,31 +56,32 @@ class QuedadasAdminViewModel : ViewModel() {
         getQuedadas()
 
     }
-    fun getUsuarios(){
+
+    fun getUsuarios() {
         _isLoading.value = true
-        var correo:String
-        var nombre:String
+        var correo: String
+        var nombre: String
         val usuariosEnQuedada = _quedadaSelecc.value.correosUsr
         var elegidos: ArrayList<UserQuedada> = arrayListOf()
         var disponibles: ArrayList<UserQuedada> = arrayListOf()
         var userQuedada: UserQuedada
         db.collection(Colecciones.usuarios)
-            .whereEqualTo("activo",true)
+            .whereEqualTo("activo", true)
             .get()
             .addOnSuccessListener { results ->
                 results.documents.mapNotNull { document ->
-                    try{
-                        nombre = document.getString("nombre")?:""
-                        correo = document.getString("correo")?:""
-                        userQuedada = UserQuedada(nombre,correo)
-                        if(correo in usuariosEnQuedada){
+                    try {
+                        nombre = document.getString("nombre") ?: ""
+                        correo = document.getString("correo") ?: ""
+                        userQuedada = UserQuedada(nombre, correo)
+                        if (correo in usuariosEnQuedada) {
                             elegidos.add(userQuedada)
-                        }else{
+                        } else {
                             disponibles.add(userQuedada)
                         }
 
-                    }catch (error: Exception){
-                        Log.e(Constantes.TAG,"Error al guardar los usuarios\n$error")
+                    } catch (error: Exception) {
+                        Log.e(Constantes.TAG, "Error al guardar los usuarios\n$error")
                     }
                 }
 
@@ -88,10 +89,13 @@ class QuedadasAdminViewModel : ViewModel() {
                 _usuariosElegidos.value = elegidos
                 _usuariosObtenidos.value = true
 
-                Log.i(Constantes.TAG,"Usuarios obtenidos correctamente\nDisponibles: ${disponibles}\nElegidos: ${elegidos}")
+                Log.i(
+                    Constantes.TAG,
+                    "Usuarios obtenidos correctamente\nDisponibles: ${disponibles}\nElegidos: ${elegidos}"
+                )
             }
-            .addOnFailureListener {error->
-                Log.e(Constantes.TAG,"Error al obtener los usuarios\n$error")
+            .addOnFailureListener { error ->
+                Log.e(Constantes.TAG, "Error al obtener los usuarios\n$error")
 
             }
     }
@@ -116,7 +120,10 @@ class QuedadasAdminViewModel : ViewModel() {
                             inscripcion = inscripcionAbierta
                         )
                     } catch (e: Exception) {
-                        Log.e(Constantes.TAG, "Error al guardar las quedadas: \n${e.printStackTrace()}")
+                        Log.e(
+                            Constantes.TAG,
+                            "Error al guardar las quedadas: \n${e.printStackTrace()}"
+                        )
                         null
                     }
                 }
@@ -125,26 +132,29 @@ class QuedadasAdminViewModel : ViewModel() {
                 Log.i(Constantes.TAG, "Quedadas recuperadas con exito")
                 _isLoading.value = false
             }
-            .addOnFailureListener {error->
+            .addOnFailureListener { error ->
                 Log.e(Constantes.TAG, "Error al obtener las quedadas de firebase\n$error")
                 _isLoading.value = false
 
             }
     }
-    
-    fun borrarQuedada(quedada: Quedada){
+
+    fun borrarQuedada(quedada: Quedada) {
         _isLoading.value = true
         db.collection(Colecciones.quedadas)
             .document(quedada.nombre)
             .delete()
             .addOnSuccessListener {
                 _isLoading.value = false
-                Log.i(Constantes.TAG,"quedadaAdminVW: QUEDADA ${quedada.nombre} BORRADA")
+                Log.i(Constantes.TAG, "quedadaAdminVW: QUEDADA ${quedada.nombre} BORRADA")
                 getQuedadas()
             }
-            .addOnFailureListener {error ->
+            .addOnFailureListener { error ->
                 _isLoading.value = false
-                Log.e(Constantes.TAG,"quedadaAdminVW: QUEDADA ${quedada.nombre}, ERROR AL BORRAR\n$error")
+                Log.e(
+                    Constantes.TAG,
+                    "quedadaAdminVW: QUEDADA ${quedada.nombre}, ERROR AL BORRAR\n$error"
+                )
 
             }
     }
@@ -153,8 +163,6 @@ class QuedadasAdminViewModel : ViewModel() {
         Log.i(Constantes.TAG, "AÑADIDA LOCALIZACION: ")
         _locNuevaQuedada.value = loc
     }
-
-
 
 
     fun crearQuedada(fecha: String, nombre: String, context: Context) {
@@ -210,10 +218,10 @@ class QuedadasAdminViewModel : ViewModel() {
 
     }
 
-    fun updateQuedada(nombreInicial: String,usuariosElegidos: List<UserQuedada>) {
+    fun updateQuedada(nombreInicial: String, usuariosElegidos: List<UserQuedada>) {
 
         val correos = arrayListOf<String>()
-        for (user in usuariosElegidos){
+        for (user in usuariosElegidos) {
             correos.add(user.correo)
         }
 
@@ -275,7 +283,6 @@ class QuedadasAdminViewModel : ViewModel() {
     fun setQuedadaCreada(value: Boolean) {
         _quedadaCreada.value = value
     }
-
 
 
     //SETTERS DE QUEDADA SELECCIONADA

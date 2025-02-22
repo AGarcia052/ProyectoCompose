@@ -34,6 +34,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.ActivityCompat
 import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQuedadaViewModel
 import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
+import com.example.proyectocompose.utils.toCustomString
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -52,7 +53,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 fun SeleccionarUbicacion(
     viewModel: MapsAdminQuedadaViewModel,
     quedadaViewModel: QuedadasAdminViewModel,
-    onDismissRequest: () -> Unit
+    onDismissRequest: (String) -> Unit
 ) {
     val context = LocalContext.current
     val TAG = "AMIGOSAPP"
@@ -116,7 +117,7 @@ fun SeleccionarUbicacion(
     }
 
     Dialog(
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = { onDismissRequest("") },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
@@ -240,7 +241,7 @@ fun SeleccionarUbicacion(
 
                         Button(
                             onClick = {
-                                onDismissRequest()
+                                onDismissRequest("")
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -257,7 +258,7 @@ fun SeleccionarUbicacion(
     if (localicacion != null && salir.value) {
         viewModel.removeMarker()
         salir.value = false
-        onDismissRequest()
+        onDismissRequest(mark!!.position.toCustomString())
     }
 }
 
