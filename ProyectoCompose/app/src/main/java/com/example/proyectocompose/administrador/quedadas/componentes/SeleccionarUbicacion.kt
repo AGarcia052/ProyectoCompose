@@ -48,11 +48,11 @@ import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
-
 @Composable
 fun SeleccionarUbicacion(
     viewModel: MapsAdminQuedadaViewModel,
     quedadaViewModel: QuedadasAdminViewModel,
+    isSeleccionar: Boolean = true,
     onDismissRequest: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -62,6 +62,7 @@ fun SeleccionarUbicacion(
     val selectedCoordinates by viewModel.selectedCoordinates.collectAsState()
     val localicacion by quedadaViewModel.locNuevaQuedada.collectAsState()
     val locationPermissionGranted = remember { mutableStateOf(false) }
+    val quedadaSelecc by quedadaViewModel.quedadaSelecc.collectAsState()
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     val location = remember { mutableStateOf<Location?>(null) }
     val cameraPositionState = rememberCameraPositionState { position = cameraPosition }
@@ -73,30 +74,54 @@ fun SeleccionarUbicacion(
         )
     }
 
+    LaunchedEffect(quedadaSelecc) {
+        if(quedadaSelecc.ubicacion.isNotEmpty()){
+            val locaz = quedadaSelecc.ubicacion.split(",")
+            viewModel.addMarker(LatLng(locaz[0].toDouble(),locaz[1].toDouble()))
+        }
+
+    }
+
+
+
+
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         locationPermissionGranted.value = granted
     }
 
-    // Request location permissions and handle location updates
-    LaunchedEffect(locationPermissionGranted.value) {
-        if (!locationPermissionGranted.value) {
-            locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-        } else {
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                )
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
-                    location.value = loc
-                    Log.d(TAG, "Location: ${loc?.latitude}, ${loc?.longitude}")
+
+    if(quedadaSelecc.ubicacion.isEmpty() && mark == null){
+        LaunchedEffect(locationPermissionGranted.value) {
+            if (!locationPermissionGranted.value) {
+                locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            } else {
+                if (ActivityCompat.checkSelfPermission(
+                        context,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
+                        location.value = loc
+                        Log.d(TAG, "Location: ${loc?.latitude}, ${loc?.longitude}")
+                    }
                 }
             }
         }
     }
+
+    LaunchedEffect(mark) {
+        if (mark != null) {
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.Builder().target(mark!!.position).zoom(15f).tilt(45f).bearing(90f).build()
+                ),
+                durationMs = 400
+            )
+        }
+    }
+
 
     LaunchedEffect(cameraPosition) {
         cameraPositionState.animate(
@@ -115,6 +140,8 @@ fun SeleccionarUbicacion(
             )
         }
     }
+
+
 
     Dialog(
         onDismissRequest = { onDismissRequest("") },
@@ -137,24 +164,30 @@ fun SeleccionarUbicacion(
                         rotationGesturesEnabled = true
                     ),
                     onMapLongClick = { latLng ->
-                        viewModel.addMarker(latLng)
-                        viewModel.selectCoordinates(latLng)
-                        viewModel.updateCoordinates(latLng)
+                        if (isSeleccionar) {
+                            viewModel.addMarker(latLng)
+                            viewModel.selectCoordinates(latLng)
+                            viewModel.updateCoordinates(latLng)
+                        }
                     },
                     onPOIClick = { poi ->
                         Toast.makeText(context, "POI: ${poi.name}", Toast.LENGTH_SHORT).show()
-                        viewModel.selectCoordinates(poi.latLng)
-                        viewModel.updateCoordinates(poi.latLng)
+                        if (isSeleccionar) {
+                            viewModel.selectCoordinates(poi.latLng)
+                            viewModel.updateCoordinates(poi.latLng)
+                        }
                     },
                     onMapClick = { latLng ->
-                        viewModel.selectCoordinates(latLng)
-                        viewModel.updateCoordinates(latLng)
-                        viewModel.updateCameraPosition(
-                            latLng,
-                            cameraPositionState.position.zoom,
-                            cameraPositionState.position.tilt,
-                            cameraPositionState.position.bearing
-                        )
+                        if (isSeleccionar) {
+                            viewModel.selectCoordinates(latLng)
+                            viewModel.updateCoordinates(latLng)
+                            viewModel.updateCameraPosition(
+                                latLng,
+                                cameraPositionState.position.zoom,
+                                cameraPositionState.position.tilt,
+                                cameraPositionState.position.bearing
+                            )
+                        }
                     },
                     onMyLocationButtonClick = {
                         viewModel.irAHome()
@@ -176,8 +209,7 @@ fun SeleccionarUbicacion(
                             snippet = it.snippet,
                             onInfoWindowClick = {
                                 viewModel.removeMarker()
-                                Toast.makeText(context, "Marcador eliminado", Toast.LENGTH_SHORT)
-                                    .show()
+                                Toast.makeText(context, "Marcador eliminado", Toast.LENGTH_SHORT).show()
                             }
                         )
                     }
@@ -191,63 +223,61 @@ fun SeleccionarUbicacion(
                         )
                     }
                 }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                if (isSeleccionar) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     ) {
-                        OutlinedTextField(
-                            value = selectedCoordinates?.latitude?.toString().orEmpty(),
-                            onValueChange = {},
-                            label = { Text("Latitude") },
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 8.dp)
-                        )
-                        OutlinedTextField(
-                            value = selectedCoordinates?.longitude?.toString().orEmpty(),
-                            onValueChange = {},
-                            label = { Text("Longitude") },
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 8.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = "Poner un marcador para aceptar")
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Button(
-                            onClick = {
-                                mark?.let {
-                                    quedadaViewModel.addLoc(it.position)
-                                    Log.d(TAG, "Ubicación seleccionada: ${it.position}")
-                                    salir.value = true
-                                } ?: Log.e(TAG, "No hay marcador seleccionado")
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 8.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(text = "Aceptar")
+                            OutlinedTextField(
+                                value = selectedCoordinates?.latitude?.toString().orEmpty(),
+                                onValueChange = {},
+                                label = { Text("Latitude") },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp)
+                            )
+                            OutlinedTextField(
+                                value = selectedCoordinates?.longitude?.toString().orEmpty(),
+                                onValueChange = {},
+                                label = { Text("Longitude") },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp)
+                            )
                         }
-
-                        Button(
-                            onClick = {
-                                onDismissRequest("")
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 8.dp)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(text = "Poner un marcador para aceptar")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(text = "Cancelar")
+                            Button(
+                                onClick = {
+                                    mark?.let {
+                                        quedadaViewModel.addLoc(it.position)
+                                        Log.d(TAG, "Ubicación seleccionada: ${it.position}")
+                                        salir.value = true
+                                    } ?: Log.e(TAG, "No hay marcador seleccionado")
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp)
+                            ) {
+                                Text(text = "Aceptar")
+                            }
+                            Button(
+                                onClick = { onDismissRequest("") },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp)
+                            ) {
+                                Text(text = "Cancelar")
+                            }
                         }
                     }
                 }

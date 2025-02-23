@@ -220,7 +220,9 @@ fun EditarQuedadaBody(
                                 quedadaViewModel = viewModel
                             ) { loc ->
                                 showSeleccUbicacion.value = false
-                                viewModel.setQuedadaSeleccUbicacion(loc)
+                                if(loc.isNotEmpty()){
+                                    viewModel.setQuedadaSeleccUbicacion(loc)
+                                }
                             }
                         }
                         Spacer(modifier = Modifier.height(30.dp))

@@ -53,6 +53,8 @@ class QuedadasAdminViewModel : ViewModel() {
         _usuariosElegidos.value = emptyList()
         _usuariosDisponibles.value = emptyList()
         _quedadaModificada.value = false
+        _locNuevaQuedada.value = null
+        _quedadaSelecc.value = Quedada()
         getQuedadas()
 
     }
