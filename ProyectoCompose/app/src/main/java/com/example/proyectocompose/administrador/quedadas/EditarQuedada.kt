@@ -52,6 +52,7 @@ import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQu
 import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
 import com.example.proyectocompose.common.BodyText
 import com.example.proyectocompose.model.UserQuedada
+import com.example.proyectocompose.utils.toCustomString
 
 
 @Composable
@@ -63,7 +64,7 @@ fun EditarQuedada(
 
     Scaffold(
         topBar = {
-            TopBarEditarQuedada(navController = navController)
+            TopBarEditarQuedada(navController = navController, mapsViewModel = mapsViewModel, quedadaViewModel = viewModel)
         }) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
@@ -77,7 +78,7 @@ fun EditarQuedada(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarEditarQuedada(navController: NavController) {
+fun TopBarEditarQuedada(navController: NavController, mapsViewModel: MapsAdminQuedadaViewModel, quedadaViewModel: QuedadasAdminViewModel) {
     TopAppBar(
         colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -93,7 +94,11 @@ fun TopBarEditarQuedada(navController: NavController) {
         },
         navigationIcon = {
             IconButton(
-                onClick = { navController.popBackStack(Rutas.quedadasAdmin, inclusive = false) }
+                onClick = {
+
+                    mapsViewModel.removeMarker()
+                    navController.popBackStack(Rutas.quedadasAdmin, inclusive = false)
+                }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -153,7 +158,11 @@ fun EditarQuedadaBody(
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = { viewModel.updateQuedada(quedadaInicial.value.nombre,usuariosElegidos.toList()) },
+                    onClick = {
+
+                        viewModel.updateQuedada(quedadaInicial.value.nombre,usuariosElegidos.toList())
+                        mapsViewModel.removeMarker()
+                              },
                     enabled = haModificado.value,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -209,7 +218,12 @@ fun EditarQuedadaBody(
                             SeleccionarUbicacion(
                                 viewModel = mapsViewModel,
                                 quedadaViewModel = viewModel
-                            ) { showSeleccUbicacion.value = false }
+                            ) { loc ->
+                                showSeleccUbicacion.value = false
+                                if(loc.isNotEmpty()){
+                                    viewModel.setQuedadaSeleccUbicacion(loc)
+                                }
+                            }
                         }
                         Spacer(modifier = Modifier.height(30.dp))
                     }

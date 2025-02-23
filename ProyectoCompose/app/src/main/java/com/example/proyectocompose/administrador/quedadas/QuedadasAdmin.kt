@@ -1,5 +1,6 @@
 package com.example.proyectocompose.administrador.quedadas
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -56,9 +57,11 @@ import com.example.proyectocompose.common.Subtitle
 import com.example.proyectocompose.common.TitleText
 import com.example.proyectocompose.model.Quedada
 import com.example.proyectocompose.utils.toCustomString
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun QuedadasAdmin(navController: NavController, viewModel: QuedadasAdminViewModel) {
+fun QuedadasAdmin(navController: NavController, viewModel: QuedadasAdminViewModel, mapsViewModel: MapsAdminQuedadaViewModel) {
 
     Scaffold(
         topBar = {
@@ -68,7 +71,7 @@ fun QuedadasAdmin(navController: NavController, viewModel: QuedadasAdminViewMode
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BodyQuedadasBody(viewModel, navController)
+            BodyQuedadasBody(viewModel, navController,mapsViewModel)
         }
     }
 
@@ -106,12 +109,15 @@ fun TopBarQuedadasAdmin(navController: NavController) {
 }
 
 @Composable
-fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavController) {
+fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavController, mapsViewModel: MapsAdminQuedadaViewModel) {
 
     val context = LocalContext.current
     val quedadas = viewModel.quedadas
     val isLoading by viewModel.isLoading.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.restart()
+    }
 
     LaunchedEffect(quedadas) {
         viewModel.getQuedadas()
@@ -126,12 +132,15 @@ fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavContro
         LazyColumn(modifier = Modifier.fillMaxSize()) {
 
             items(quedadas) { quedada ->
-                ItemQuedada(quedada, navController, viewModel)
+                ItemQuedada(quedada, navController, viewModel, mapsViewModel)
             }
         }
 
         FloatingActionButton(
-            onClick = { navController.navigate(Rutas.addQuedada) },
+            onClick = {
+
+                navController.navigate(Rutas.addQuedada)
+                      },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
@@ -150,9 +159,13 @@ fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavContro
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: QuedadasAdminViewModel) {
+fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: QuedadasAdminViewModel, mapsAdminQuedadaViewModel: MapsAdminQuedadaViewModel) {
     var showDeleteDialog by remember { mutableStateOf(false) }
-
+    val contexto = LocalContext.current
+    val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+    val quedadaFecha = LocalDate.parse(quedada.fecha, formatter)
+    val currentDate = LocalDate.now()
+    val showMapa = remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -160,8 +173,17 @@ fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: Queda
             .border(1.dp, color = Color.Gray, RectangleShape)
             .combinedClickable(
                 onClick = {
-                    viewModel.setQuedadaSelecc(quedada)
-                    navController.navigate(Rutas.editarQuedada)
+
+                    if(quedadaFecha.isBefore(currentDate) || quedadaFecha.isEqual(currentDate)){
+
+                        Toast.makeText(contexto,"La quedada ya ha cerrado, no se puede modificar",Toast.LENGTH_SHORT).show()
+
+                    }else{
+                        viewModel.setQuedadaSelecc(quedada)
+                        navController.navigate(Rutas.editarQuedada)
+                    }
+
+
                 },
                 onLongClick = {
                     showDeleteDialog = true
@@ -176,8 +198,16 @@ fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: Queda
             BodyText(text = "Número de asistentes: ${quedada.correosUsr.size}")
             Spacer(modifier = Modifier.height(4.dp))
 
+            Row(modifier = Modifier.fillMaxWidth()){
+                BodyText(text = "Ubicación: ")
+                Button(onClick = {
+                    viewModel.setQuedadaSelecc(quedada)
+                    showMapa.value = true
+                }){
+                    Text(text="Ver ubicación")
+                }
 
-            BodyText(text = "Ubicación: ${quedada.ubicacion}")
+            }
             Spacer(modifier = Modifier.height(4.dp))
             BodyText(text = "Fecha: ${quedada.fecha}")
 
@@ -204,6 +234,12 @@ fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: Queda
             }
         )
     }
+    if(showMapa.value){
+        SeleccionarUbicacion(isSeleccionar = false, quedadaViewModel = viewModel, viewModel = mapsAdminQuedadaViewModel) {
+            showMapa.value = false
+        }
+    }
+
 }
 
 

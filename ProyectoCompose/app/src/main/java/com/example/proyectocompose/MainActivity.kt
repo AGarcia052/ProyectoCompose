@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
                        Perfil(navController = navController, dashboardViewModel = dashboardViewModel, perfilViewModel = perfilViewModel)
                     }
                     composable(Rutas.quedadasAdmin){
-                        QuedadasAdmin(navController = navController, viewModel = quedadasAdminViewModel)
+                        QuedadasAdmin(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
                     }
                     composable(Rutas.addQuedada){
                         AniadirQuedada(navController = navController, viewModel = quedadasAdminViewModel)
