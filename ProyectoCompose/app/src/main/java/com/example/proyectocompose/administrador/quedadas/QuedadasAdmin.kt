@@ -61,7 +61,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun QuedadasAdmin(navController: NavController, viewModel: QuedadasAdminViewModel) {
+fun QuedadasAdmin(navController: NavController, viewModel: QuedadasAdminViewModel, mapsViewModel: MapsAdminQuedadaViewModel) {
 
     Scaffold(
         topBar = {
@@ -71,7 +71,7 @@ fun QuedadasAdmin(navController: NavController, viewModel: QuedadasAdminViewMode
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BodyQuedadasBody(viewModel, navController)
+            BodyQuedadasBody(viewModel, navController,mapsViewModel)
         }
     }
 
@@ -109,7 +109,7 @@ fun TopBarQuedadasAdmin(navController: NavController) {
 }
 
 @Composable
-fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavController) {
+fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavController, mapsViewModel: MapsAdminQuedadaViewModel) {
 
     val context = LocalContext.current
     val quedadas = viewModel.quedadas
@@ -132,7 +132,7 @@ fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavContro
         LazyColumn(modifier = Modifier.fillMaxSize()) {
 
             items(quedadas) { quedada ->
-                ItemQuedada(quedada, navController, viewModel)
+                ItemQuedada(quedada, navController, viewModel, mapsViewModel)
             }
         }
 
@@ -159,13 +159,13 @@ fun BodyQuedadasBody(viewModel: QuedadasAdminViewModel, navController: NavContro
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: QuedadasAdminViewModel) {
+fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: QuedadasAdminViewModel, mapsAdminQuedadaViewModel: MapsAdminQuedadaViewModel) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     val contexto = LocalContext.current
     val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
     val quedadaFecha = LocalDate.parse(quedada.fecha, formatter)
     val currentDate = LocalDate.now()
-
+    val showMapa = remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -198,8 +198,16 @@ fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: Queda
             BodyText(text = "Número de asistentes: ${quedada.correosUsr.size}")
             Spacer(modifier = Modifier.height(4.dp))
 
+            Row(modifier = Modifier.fillMaxWidth()){
+                BodyText(text = "Ubicación: ")
+                Button(onClick = {
+                    viewModel.setQuedadaSelecc(quedada)
+                    showMapa.value = true
+                }){
+                    Text(text="Ver ubicación")
+                }
 
-            BodyText(text = "Ubicación: ${quedada.ubicacion}")
+            }
             Spacer(modifier = Modifier.height(4.dp))
             BodyText(text = "Fecha: ${quedada.fecha}")
 
@@ -226,6 +234,12 @@ fun ItemQuedada(quedada: Quedada, navController: NavController, viewModel: Queda
             }
         )
     }
+    if(showMapa.value){
+        SeleccionarUbicacion(isSeleccionar = false, quedadaViewModel = viewModel, viewModel = mapsAdminQuedadaViewModel) {
+            showMapa.value = false
+        }
+    }
+
 }
 
 

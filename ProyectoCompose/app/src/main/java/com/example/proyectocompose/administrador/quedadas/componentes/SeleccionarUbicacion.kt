@@ -223,12 +223,13 @@ fun SeleccionarUbicacion(
                         )
                     }
                 }
-                if (isSeleccionar) {
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
+                        if (isSeleccionar) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -279,7 +280,12 @@ fun SeleccionarUbicacion(
                                 Text(text = "Cancelar")
                             }
                         }
-                    }
+                    }else{
+                        Row(modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center){
+                            Button(onClick = { onDismissRequest("") }) { Text(text="Volver") }
+                        }
+                        }
                 }
             }
         }
