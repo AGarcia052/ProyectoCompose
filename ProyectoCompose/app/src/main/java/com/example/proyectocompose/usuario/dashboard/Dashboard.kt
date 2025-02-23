@@ -184,11 +184,16 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
     val msgObtenidos by dashboardVM.msgObtenidos.collectAsState()
     val contexto = LocalContext.current
     val notificacionEnviada by dashboardVM.notificacionEnviada.collectAsState()
-    LaunchedEffect(Unit) {
-        Log.i(Constantes.TAG,"Obteniendo mensajes no leídos...")
+    val usuario by dashboardVM.usuario.collectAsState()
 
-        dashboardVM.obtenerMensajesNoLeidos()
+    if(usuario.correo.isNotEmpty()){
+        LaunchedEffect(Unit) {
+            Log.i(Constantes.TAG,"Obteniendo mensajes no leídos...")
+
+            dashboardVM.obtenerMensajesNoLeidos()
+        }
     }
+
 
     LaunchedEffect(msgObtenidos) {
         if (msgObtenidos && !notificacionEnviada) {
@@ -205,7 +210,7 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         if (isLoading){
             Text(text = "Cargando usuarios conectados...")
         }else{
-            Text(text = "Usuarios conectados: "+numUsuariosConectados)
+            Text(text = "Usuarios conectados: $numUsuariosConectados")
         }
     }
     Column(

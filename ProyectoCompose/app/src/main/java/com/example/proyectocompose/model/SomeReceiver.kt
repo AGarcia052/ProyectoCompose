@@ -1,5 +1,6 @@
 package com.example.proyectocompose.model
 
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -23,7 +24,7 @@ class SomeReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
 
         val databaseReference = FirebaseDatabase.getInstance().getReference("mensajes")
-
+        val notificationManager = context.getSystemService(NotificationManager::class.java)
         val correoUsr = intent.getStringExtra("mensajes_leer")
 
         if (correoUsr != null) {
@@ -35,6 +36,7 @@ class SomeReceiver : BroadcastReceiver() {
                         for (messageSnapshot in snapshot.children) {
                             messageSnapshot.ref.child("leido").setValue(true)
                         }
+                        notificationManager.cancel("AMIGOS APP".hashCode())
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -43,6 +45,10 @@ class SomeReceiver : BroadcastReceiver() {
                 })
         } else {
             Log.e(Constantes.TAG, "SOMERECEIVER: El correo del usuario es nulo")
+            notificationManager.cancel("AMIGOS APP".hashCode())
+
         }
+
+
     }
 }

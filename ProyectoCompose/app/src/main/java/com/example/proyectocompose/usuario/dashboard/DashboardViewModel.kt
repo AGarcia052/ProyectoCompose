@@ -151,7 +151,10 @@ class DashboardViewModel:ViewModel() {
 
                     }
 
+
+
                     sendersYCant = Pair(distintosSender.count(),cantidad)
+                    Log.d(Constantes.TAG,"Sender: ${sendersYCant.first}, Total mensajes: ${sendersYCant.second}")
 
                     if(sendersYCant.second != 0){
                         _msgObtenidos.value = true
@@ -189,7 +192,7 @@ class DashboardViewModel:ViewModel() {
         }
         val actionPendingIntent = PendingIntent.getBroadcast(
             context,
-            1,
+            0,
             actionIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -197,16 +200,21 @@ class DashboardViewModel:ViewModel() {
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         val notification = NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
             .setContentTitle("AMIGOS APP")
-            .setContentText("Tienes ${sendersYCant.second} mensajes sin leer de ${sendersYCant.first} chats ")
+            .setContentText("Tienes ${sendersYCant.second} mensajes sin leer de ${sendersYCant.first} chats")
             .setSmallIcon(R.drawable.ic_chat)
-            .setContentIntent(mainPendingIntent)
-            .addAction(R.drawable.ic_double_check, "Marcar como leído", actionPendingIntent)
+            //.setContentIntent(mainPendingIntent) // esto abre la app, problema si estas en dashboard
+            .addAction(
+                R.drawable.ic_double_check,
+                "Marcar como leído",
+                actionPendingIntent
+            )
             .setAutoCancel(true)
             .build()
 
         notificationManager.notify("AMIGOS APP".hashCode(), notification)
         _notificacionEnviada.value = true
     }
+
 
     fun setMsgObtenidos(value: Boolean){
         _msgObtenidos.value = value
