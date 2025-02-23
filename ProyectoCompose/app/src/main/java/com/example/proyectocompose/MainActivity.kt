@@ -1,9 +1,16 @@
 package com.example.proyectocompose
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -44,12 +51,32 @@ class MainActivity : ComponentActivity() {
     val quedadasAdminViewModel = QuedadasAdminViewModel()
     val mapsAdminQuedadaViewModel = MapsAdminQuedadaViewModel()
     val usuariosAfinesViewModel = UsuariosAfinesViewModel()
+    companion object {
+        const val CHANNEL_ID = "sinLeerChannel"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ProyectoComposeTheme {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            android.Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        ActivityCompat.requestPermissions(
+                            this,
+                            arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                            1
+                        )
+                    }
+                }
+                createNotificationChannel()
+
+
                 val navController = rememberNavController()
 
                 NavHost(navController, startDestination = Rutas.login){
@@ -120,6 +147,20 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         loginViewModel.cambiarConectado(true)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Notificaciones"
+            val descriptionText = "Canal para notificaciones de la app"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(MainActivity.CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 }
 
