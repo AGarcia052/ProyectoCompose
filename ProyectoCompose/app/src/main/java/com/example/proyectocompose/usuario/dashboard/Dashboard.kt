@@ -130,7 +130,7 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
                     }
                 },
                 onDismiss = { mostrarMenuPuntos = false },
-                esAdministrador = { if (usuario!!.rol == "Administrador") true else false }
+                esAdministrador = { usuario.rol == "Administrador" }
             )
         }
     )

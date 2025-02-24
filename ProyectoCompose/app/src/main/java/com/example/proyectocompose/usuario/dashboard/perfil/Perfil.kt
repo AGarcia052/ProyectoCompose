@@ -121,6 +121,11 @@ fun TopBarProfile(navController: NavController) {
                     contentDescription = "Volver atrás"
                 )
             }
+        },
+        actions = {
+            IconButton(onClick = { navController.navigate(Rutas.likesUsuario) }) {
+                Icon(painter = painterResource(R.drawable.ic_heart), contentDescription = "Lista likes")
+            }
         }
     )
 }

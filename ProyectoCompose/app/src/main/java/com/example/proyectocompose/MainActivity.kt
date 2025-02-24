@@ -39,6 +39,8 @@ import com.example.proyectocompose.usuario.dashboard.Dashboard
 import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 import com.example.proyectocompose.usuario.dashboard.perfil.Perfil
 import com.example.proyectocompose.usuario.dashboard.perfil.PerfilViewModel
+import com.example.proyectocompose.usuario.dashboard.perfil.listaLikes.ListaLikes
+import com.example.proyectocompose.usuario.dashboard.perfil.listaLikes.ListaLikesViewModel
 import com.example.proyectocompose.utils.Rutas
 
 class MainActivity : ComponentActivity() {
@@ -51,6 +53,7 @@ class MainActivity : ComponentActivity() {
     val quedadasAdminViewModel = QuedadasAdminViewModel()
     val mapsAdminQuedadaViewModel = MapsAdminQuedadaViewModel()
     val usuariosAfinesViewModel = UsuariosAfinesViewModel()
+    val likesViewModel = ListaLikesViewModel()
     companion object {
         const val CHANNEL_ID = "sinLeerChannel"
     }
@@ -127,6 +130,9 @@ class MainActivity : ComponentActivity() {
                             viewModel = usuariosAfinesViewModel, navController = navController,
                             dashboardViewModel = dashboardViewModel
                         )
+                    }
+                    composable(Rutas.likesUsuario){
+                        ListaLikes(viewModel = likesViewModel, dashboardViewModel = dashboardViewModel, navController)
                     }
                 }
             }
