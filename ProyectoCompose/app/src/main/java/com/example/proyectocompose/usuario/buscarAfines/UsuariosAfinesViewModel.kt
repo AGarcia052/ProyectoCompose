@@ -252,23 +252,6 @@ class UsuariosAfinesViewModel : ViewModel() {
         val amigosMasLikes = (_usuario.value.amigos + _usuario.value.usuariosConLike).filter { it != _usuario.value.correo }
 
 
-        //EVITAR USO DE INDICES
-
-//        results = if(_usuario.value.amigos.isNotEmpty() || _usuario.value.usuariosConLike.isNotEmpty()){
-//            db.collection(Colecciones.usuarios)
-//                .whereNotIn("correo", amigosMasLikes)
-//                .whereEqualTo("activo", true)
-//                .get()
-//                .await()
-//
-//        }else{
-//            db.collection(Colecciones.usuarios)
-//                .whereEqualTo("activo", true)
-//                .get()
-//                .await()
-//        }
-
-
         val todos = results.documents.mapNotNull { document ->
 
             val formField = document.get("formulario") as Map<*, *>

@@ -16,4 +16,5 @@ object Rutas {
     val editarUsuario = "EditarUsuario"
     val addQuedada = "AniadirQuedada"
     val editarQuedada = "EditarQuedada"
+    val likesUsuario = "ListaLikes"
 }
