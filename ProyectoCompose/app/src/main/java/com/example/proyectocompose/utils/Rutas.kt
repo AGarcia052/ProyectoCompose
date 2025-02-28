@@ -1,4 +1,4 @@
-package com.example.proyectocompose
+package com.example.proyectocompose.utils
 
 object Rutas {
     val login = "Login"
@@ -16,4 +16,5 @@ object Rutas {
     val editarUsuario = "EditarUsuario"
     val addQuedada = "AniadirQuedada"
     val editarQuedada = "EditarQuedada"
+    val likesUsuario = "ListaLikes"
 }

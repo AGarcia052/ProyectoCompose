@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 
 @Composable
 fun EditarUsuario(navController: NavController, listaUsuariosViewModel: ListaUsuariosViewModel){

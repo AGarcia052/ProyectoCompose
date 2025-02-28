@@ -5,7 +5,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
+import com.example.proyectocompose.utils.Colecciones
 import com.example.proyectocompose.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore

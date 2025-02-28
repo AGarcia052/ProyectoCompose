@@ -2,10 +2,9 @@ package com.example.proyectocompose.usuario.amigos
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
-import com.example.proyectocompose.Constantes.TAG
+import com.example.proyectocompose.utils.Colecciones
+import com.example.proyectocompose.utils.Constantes.TAG
 import com.example.proyectocompose.model.Amigo
-import com.example.proyectocompose.model.User
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
