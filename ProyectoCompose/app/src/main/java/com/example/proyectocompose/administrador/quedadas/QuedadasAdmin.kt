@@ -97,7 +97,7 @@ fun TopBarQuedadasAdmin(navController: NavController) {
         },
         navigationIcon = {
             IconButton(
-                onClick = { navController.popBackStack(Rutas.dashboard, inclusive = false) }
+                onClick = { navController.popBackStack(Rutas.adminPrincipal, inclusive = false) }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,

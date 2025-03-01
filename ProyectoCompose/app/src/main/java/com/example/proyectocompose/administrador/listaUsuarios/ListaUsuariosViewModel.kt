@@ -74,7 +74,7 @@ class ListaUsuariosViewModel:ViewModel() {
                 val listaUsuarios = mutableListOf<User>()
                 for (document in result) {
                     val usuario = document.toObject(User::class.java)
-                    usuario.activo = document.getBoolean("activado") ?: false
+                    usuario.activo = document.getBoolean("activo") ?: false
                     listaUsuarios.add(usuario)
                 }
                 _usuarios.value = listaUsuarios
@@ -86,7 +86,7 @@ class ListaUsuariosViewModel:ViewModel() {
 
     fun cambiarEstadoUsuario(activo: Boolean){
         db.collection(Colecciones.usuarios).document(_usuarioAEditar.value!!.correo)
-            .update("activado",activo)
+            .update("activo",activo)
             .addOnSuccessListener {
                 _usuarioAEditar.value = _usuarioAEditar.value!!.copy(activo = activo)
                 Log.d(TAG, "Estado del usuario actualizado")

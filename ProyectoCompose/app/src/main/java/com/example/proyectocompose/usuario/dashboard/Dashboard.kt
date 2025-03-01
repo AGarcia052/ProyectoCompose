@@ -45,10 +45,11 @@ import com.example.proyectocompose.MainActivity
 import com.example.proyectocompose.R
 import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
+import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
 import com.example.proyectocompose.utils.Constantes
 
 @Composable
-fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM: DashboardViewModel){
+fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM: DashboardViewModel, listaAmigosViewModel: ListaAmigosViewModel){
 
 
 
@@ -60,7 +61,7 @@ fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM:
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BodyDashboard(navController, dashboardVM)
+            BodyDashboard(navController, dashboardVM, listaAmigosViewModel, loginVM)
         }
     }
 
@@ -178,7 +179,7 @@ fun DesplegarMenuPuntos(expanded: Boolean, opciones: List<String>, onItemClick: 
 }
 
 @Composable
-fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel){
+fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel, listaAmigosViewModel: ListaAmigosViewModel, loginViewModel: LoginViewModel){
     val isLoading by dashboardVM.isLoading.collectAsState()
     val numUsuariosConectados by dashboardVM.numUsuariosConectados.collectAsState()
     val msgObtenidos by dashboardVM.msgObtenidos.collectAsState()
@@ -235,8 +236,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Rutas.amigos) {
-                popUpTo(Rutas.dashboard) { inclusive = false }
+            onClick = {
+                listaAmigosViewModel.cargarUsuarios(loginViewModel.getCurrentEmail())
+                navController.navigate(Rutas.amigos) {popUpTo(Rutas.dashboard) { inclusive = false }
             }},
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier

@@ -223,7 +223,6 @@ class UsuariosAfinesViewModel : ViewModel() {
                 }
                 .addOnFailureListener {error ->
                     Log.e(Constantes.TAG,"Error al añadir candidato a likeados\n$error")
-
                 }
         }
 
