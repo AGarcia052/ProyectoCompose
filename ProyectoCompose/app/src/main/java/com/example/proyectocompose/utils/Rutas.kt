@@ -10,6 +10,8 @@ object Rutas {
     val amigos = "Amigos"
     val chat = "Chat"
     val quedadasUsuario = "QuedadasUsuario"
+    val datosQuedada = "DatosQuedada"
+    val anunciarLlegada = "AnunciarLlegada"
     val adminPrincipal = "AdminPrincipal"
     val usuariosAdmin = "UsuariosAdmin"
     val quedadasAdmin = "QuedadasAdmin"

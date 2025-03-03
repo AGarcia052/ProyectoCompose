@@ -36,12 +36,13 @@ import androidx.navigation.NavController
 import com.example.proyectocompose.R
 import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.common.*
+import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 
 @Composable
-fun Login(loginViewModel: LoginViewModel, navController: NavController) {
+fun Login(loginViewModel: LoginViewModel, navController: NavController, dashboardVM: DashboardViewModel) {
 
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
@@ -87,6 +88,9 @@ fun Login(loginViewModel: LoginViewModel, navController: NavController) {
         val destino = if(activo) Rutas.dashboard else Rutas.usrNoActivo
         if (loginSuccess) {
             loginViewModel.restart()
+            if (destino == Rutas.dashboard){
+                dashboardVM.cargarUsuario(loginViewModel.getCurrentEmail())
+            }
             navController.navigate(destino) {
                 popUpTo(Rutas.login) { inclusive = false }
             }

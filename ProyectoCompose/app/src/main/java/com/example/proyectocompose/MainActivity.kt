@@ -41,6 +41,8 @@ import com.example.proyectocompose.usuario.dashboard.perfil.Perfil
 import com.example.proyectocompose.usuario.dashboard.perfil.PerfilViewModel
 import com.example.proyectocompose.usuario.dashboard.perfil.listaLikes.ListaLikes
 import com.example.proyectocompose.usuario.dashboard.perfil.listaLikes.ListaLikesViewModel
+import com.example.proyectocompose.usuario.quedadas.DatosQuedada
+import com.example.proyectocompose.usuario.quedadas.QuedadasUsuario
 import com.example.proyectocompose.utils.Rutas
 
 class MainActivity : ComponentActivity() {
@@ -85,7 +87,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController, startDestination = Rutas.login){
 
                     composable(Rutas.login) {
-                        Login(navController = navController, loginViewModel = loginViewModel)
+                        Login(navController = navController, loginViewModel = loginViewModel, dashboardVM = dashboardViewModel)
                     }
                     composable(Rutas.formulario) {
                         Formulario(navController = navController,loginViewModel= loginViewModel)
@@ -133,6 +135,15 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Rutas.likesUsuario){
                         ListaLikes(viewModel = likesViewModel, dashboardViewModel = dashboardViewModel, navController)
+                    }
+                    composable(Rutas.quedadasUsuario) {
+                        QuedadasUsuario(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
+                    }
+                    composable(Rutas.datosQuedada) {
+                        DatosQuedada(navController = navController, viewModel = quedadasAdminViewModel, loginViewModel = loginViewModel)
+                    }
+                    composable(Rutas.anunciarLlegada) {
+
                     }
                 }
             }

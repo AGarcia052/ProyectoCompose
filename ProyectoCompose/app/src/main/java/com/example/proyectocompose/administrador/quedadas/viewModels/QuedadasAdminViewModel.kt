@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import com.example.proyectocompose.model.Llegada
 import com.example.proyectocompose.utils.Colecciones
 import com.example.proyectocompose.utils.Constantes
 import com.example.proyectocompose.model.Quedada
@@ -47,6 +48,7 @@ class QuedadasAdminViewModel : ViewModel() {
 
     private val _usuariosObtenidos = MutableStateFlow<Boolean>(false)
     val usuariosObtenidos: StateFlow<Boolean> get() = _usuariosObtenidos
+
 
     fun restart() {
         _usuariosObtenidos.value = false
@@ -101,6 +103,7 @@ class QuedadasAdminViewModel : ViewModel() {
 
             }
     }
+
 
     fun getQuedadas() {
         _isLoading.value = true
@@ -285,7 +288,28 @@ class QuedadasAdminViewModel : ViewModel() {
     fun setQuedadaCreada(value: Boolean) {
         _quedadaCreada.value = value
     }
+    fun getQuedadaSelecc():Quedada {
+        return _quedadaSelecc.value
+    }
 
+    fun inscribirse(correo: String) {
+        var usersQuedada = ArrayList<UserQuedada>()
+        val correos = _quedadaSelecc.value.correosUsr.toMutableList()
+        correos.add(correo)
+        for (correo in correos) {
+            usersQuedada.add(UserQuedada("", correo))
+        }
+        updateQuedada(_quedadaSelecc.value.nombre, usersQuedada)
+    }
+    fun desinscribirse(correo: String){
+        var usersQuedada = ArrayList<UserQuedada>()
+        val correos = _quedadaSelecc.value.correosUsr.toMutableList()
+        correos.remove(correo)
+        for (correo in correos) {
+            usersQuedada.add(UserQuedada("", correo))
+        }
+        updateQuedada(_quedadaSelecc.value.nombre, usersQuedada)
+    }
 
     //SETTERS DE QUEDADA SELECCIONADA
 
