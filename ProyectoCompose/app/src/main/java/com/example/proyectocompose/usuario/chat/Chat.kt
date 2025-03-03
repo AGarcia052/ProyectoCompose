@@ -1,6 +1,5 @@
 package com.example.proyectocompose.usuario.chat
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,20 +36,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.model.Mensaje
-import com.example.proyectocompose.usuario.amigos.BodyListaAmigos
 import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
+import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 
 @Composable
 fun Chat(navController: NavController, loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel, chatViewModel: ChatViewModel){
     Scaffold(
         topBar = {
-            TopBarChat(navController,listaAmigosViewModel)
+            TopBarChat(navController,listaAmigosViewModel, loginViewModel)
         }) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
@@ -64,7 +61,7 @@ fun Chat(navController: NavController, loginViewModel: LoginViewModel, listaAmig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosViewModel){
+fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosViewModel, loginViewModel: LoginViewModel){
     val usuarioSeleccionado by listaAmigosViewModel.usuarioSeleccionado.collectAsState()
     TopAppBar(
         colors = topAppBarColors(
@@ -82,6 +79,7 @@ fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosVi
         navigationIcon = {
             IconButton(
                 onClick = {
+                    listaAmigosViewModel.cargarUsuarios(loginViewModel.getCurrentEmail())
                     navController.popBackStack(Rutas.amigos, inclusive = false)
                 }
             ) {

@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
+import com.example.proyectocompose.utils.Colecciones
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
@@ -29,6 +29,8 @@ class FormularioViewModel: ViewModel(){
     val apellidos = MutableStateFlow("")
     val fecNac = MutableStateFlow("")
     val correo = MutableStateFlow("")
+    val sexo = MutableStateFlow("")
+    val descripcion = MutableStateFlow("")
     //FORMULARIO
     val relacionSeria = MutableStateFlow(false)
     val deportes = MutableStateFlow(50)
@@ -55,7 +57,8 @@ class FormularioViewModel: ViewModel(){
 
     fun completarRegistro(context: Context){
 
-        var form = mapOf(
+        val form = mapOf(
+            "sexo" to sexo.value,
             "relacionSeria" to relacionSeria.value,
             "deportes" to deportes.value,
             "arte" to arte.value,
@@ -65,16 +68,19 @@ class FormularioViewModel: ViewModel(){
             "interesSexual" to interesSexual.value
         )
 
-        var user = mapOf(
+        val user = mapOf(
             "nombre" to nombre.value,
             "apellidos" to apellidos.value,
             "fecNac" to fecNac.value,
+            "descripcion" to descripcion.value,
             "correo" to correo.value,
             "formCompletado" to true,
-            "rol" to "USUARIO",
+            "rol" to "Usuario",
             "activo" to false,
             "conectado" to false,
-            "formulario" to form
+            "formulario" to form,
+            "amigos" to listOf<String>(),
+            "usuariosConLike" to listOf<String>()
         )
 
         db.collection(Colecciones.usuarios)

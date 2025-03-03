@@ -65,7 +65,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.proyectocompose.BuildConfig
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.common.ComboBox
 import com.example.proyectocompose.login.DatePickerEdad
 import com.example.proyectocompose.login.SliderPreference
@@ -121,6 +121,11 @@ fun TopBarProfile(navController: NavController) {
                     contentDescription = "Volver atrás"
                 )
             }
+        },
+        actions = {
+            IconButton(onClick = { navController.navigate(Rutas.likesUsuario) }) {
+                Icon(painter = painterResource(R.drawable.ic_heart), contentDescription = "Lista likes")
+            }
         }
     )
 }
@@ -160,13 +165,13 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
             usuarioInicial.nombre != nombre.value ||
                     usuarioInicial.apellidos != apellidos.value ||
                     usuarioInicial.fecNac != fecnac.value ||
-                    usuarioInicial.formulario?.relacionSeria != relacionSeria.value ||
-                    usuarioInicial.formulario?.deportes != deportes.intValue ||
-                    usuarioInicial.formulario?.arte != arte.intValue ||
-                    usuarioInicial.formulario?.politica != politica.intValue ||
-                    usuarioInicial.formulario?.tieneHijos != tieneHijos.value ||
-                    usuarioInicial.formulario?.quiereHijos != quiereHijos.value ||
-                    usuarioInicial.formulario?.interesSexual != interesSexual.value
+                    usuarioInicial.formulario.relacionSeria != relacionSeria.value ||
+                    usuarioInicial.formulario.deportes != deportes.intValue ||
+                    usuarioInicial.formulario.arte != arte.intValue ||
+                    usuarioInicial.formulario.politica != politica.intValue ||
+                    usuarioInicial.formulario.tieneHijos != tieneHijos.value ||
+                    usuarioInicial.formulario.quiereHijos != quiereHijos.value ||
+                    usuarioInicial.formulario.interesSexual != interesSexual.value
         }
     }
 
@@ -418,27 +423,26 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
             ) {
 
                 Button(onClick = {
-                    perfilViewModel.actualizarUsuario(
-                        User(
-                            nombre = nombre.value,
-                            apellidos = apellidos.value,
-                            activo = true,
-                            conectado = true,
-                            correo = usuario.value.correo,
-                            fecNac = fecnac.value,
-                            formCompletado = true,
-                            rol = usuario.value.rol,
-                            formulario = Formulario(
-                                relacionSeria = relacionSeria.value,
-                                deportes = deportes.intValue,
-                                interesSexual = interesSexual.value,
-                                politica = politica.intValue,
-                                quiereHijos = quiereHijos.value,
-                                tieneHijos = tieneHijos.value,
-                                arte = arte.intValue
-                            )
+                    var usuarioModificado = User(
+                        nombre = nombre.value,
+                        apellidos = apellidos.value,
+                        activo = true,
+                        conectado = true,
+                        correo = usuario.value.correo,
+                        fecNac = fecnac.value,
+                        formCompletado = true,
+                        rol = usuario.value.rol,
+                        formulario = Formulario(
+                            relacionSeria = relacionSeria.value,
+                            deportes = deportes.intValue,
+                            interesSexual = interesSexual.value,
+                            politica = politica.intValue,
+                            quiereHijos = quiereHijos.value,
+                            tieneHijos = tieneHijos.value,
+                            arte = arte.intValue
                         )
                     )
+                    perfilViewModel.actualizarUsuario(usuarioModificado)
                 }, enabled = haModificado.value) {
                     Text(text = "Guardar cambios")
                 }
@@ -477,6 +481,7 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
 
             if (usuarioMod) {
                 navController.navigate(Rutas.dashboard) {
+                    viewModel.cargarUsuario(usuario.value.correo)
                     popUpTo(Rutas.dashboard) { inclusive = false }
                 }
                 perfilViewModel.setUsuarioMod(false)

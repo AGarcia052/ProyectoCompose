@@ -7,14 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -46,18 +43,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.administrador.quedadas.componentes.SeleccionarFecha
 import com.example.proyectocompose.administrador.quedadas.componentes.SeleccionarUbicacion
 import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQuedadaViewModel
 import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
 import com.example.proyectocompose.common.BodyText
-import com.example.proyectocompose.common.Subtitle
-import com.example.proyectocompose.model.Quedada
-import com.example.proyectocompose.model.User
 import com.example.proyectocompose.model.UserQuedada
 import com.example.proyectocompose.utils.toCustomString
 
@@ -71,7 +64,7 @@ fun EditarQuedada(
 
     Scaffold(
         topBar = {
-            TopBarEditarQuedada(navController = navController)
+            TopBarEditarQuedada(navController = navController, mapsViewModel = mapsViewModel, quedadaViewModel = viewModel)
         }) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
@@ -85,7 +78,7 @@ fun EditarQuedada(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarEditarQuedada(navController: NavController) {
+fun TopBarEditarQuedada(navController: NavController, mapsViewModel: MapsAdminQuedadaViewModel, quedadaViewModel: QuedadasAdminViewModel) {
     TopAppBar(
         colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -101,7 +94,11 @@ fun TopBarEditarQuedada(navController: NavController) {
         },
         navigationIcon = {
             IconButton(
-                onClick = { navController.popBackStack(Rutas.quedadasAdmin, inclusive = false) }
+                onClick = {
+
+                    mapsViewModel.removeMarker()
+                    navController.popBackStack(Rutas.quedadasAdmin, inclusive = false)
+                }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -161,7 +158,11 @@ fun EditarQuedadaBody(
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = { viewModel.updateQuedada(quedadaInicial.value.nombre,usuariosElegidos.toList()) },
+                    onClick = {
+
+                        viewModel.updateQuedada(quedadaInicial.value.nombre,usuariosElegidos.toList())
+                        mapsViewModel.removeMarker()
+                              },
                     enabled = haModificado.value,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -217,7 +218,12 @@ fun EditarQuedadaBody(
                             SeleccionarUbicacion(
                                 viewModel = mapsViewModel,
                                 quedadaViewModel = viewModel
-                            ) { showSeleccUbicacion.value = false }
+                            ) { loc ->
+                                showSeleccUbicacion.value = false
+                                if(loc.isNotEmpty()){
+                                    viewModel.setQuedadaSeleccUbicacion(loc)
+                                }
+                            }
                         }
                         Spacer(modifier = Modifier.height(30.dp))
                     }

@@ -53,6 +53,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/path_provider" />
         </provider>
+        <receiver android:name="com.example.proyectocompose.model.SomeReceiver" android:exported="true"/>
     </application>
 
 </manifest>

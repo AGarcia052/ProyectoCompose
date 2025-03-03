@@ -2,7 +2,6 @@ package com.example.proyectocompose.login
 
 import android.app.DatePickerDialog
 import android.net.Uri
-import android.util.Log
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,17 +20,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -63,7 +55,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.proyectocompose.BuildConfig
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.common.BodyText
 import com.example.proyectocompose.common.ClickableText
 import com.example.proyectocompose.common.ComboBox
@@ -171,11 +163,12 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
     val interesSexual by viewModel.interesSexual.collectAsState()
     val imageUri by viewModel.imageUri.observeAsState(Uri.EMPTY)
     val imageFile by viewModel.imageFile.observeAsState(null)
+    val descripcion by viewModel.descripcion.collectAsState()
     val uploadSuccess by viewModel.uploadSuccess.observeAsState()
     var btnEnabled by remember {
         mutableStateOf(false)
     }
-    btnEnabled = nombre.trim().isNotEmpty()  && apellidos.trim().isNotEmpty() && fecNac.isNotEmpty() && interesSexual.trim().isNotEmpty()
+    btnEnabled = nombre.trim().isNotEmpty()  && apellidos.trim().isNotEmpty() && fecNac.isNotEmpty() && interesSexual.trim().isNotEmpty() && imageUri != Uri.EMPTY
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
@@ -231,6 +224,16 @@ fun DatosPreferencias(viewModel: FormularioViewModel, back: () -> Unit, next: ()
             Spacer(modifier = Modifier.height(10.dp))
 
             DatePickerEdad(fecNac) { viewModel.fecNac.value = it }
+            Spacer(modifier = Modifier.height(10.dp))
+            ComboBox(listOf("Hombre","Mujer")) { viewModel.sexo.value = it }
+            Spacer(modifier = Modifier.height(20.dp))
+            TextField(
+                value = descripcion,
+                onValueChange = { viewModel.descripcion.value = it },
+                placeholder = { Text("Ingresa la descripción aquí") },
+                maxLines = 5,
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(text = "Imagen de perfil: ", modifier = Modifier.padding(bottom = 10.dp))

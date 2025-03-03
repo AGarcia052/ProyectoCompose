@@ -1,5 +1,6 @@
 package com.example.proyectocompose.usuario.dashboard
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -39,12 +39,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.proyectocompose.MainActivity
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
+import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
+import com.example.proyectocompose.utils.Constantes
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+
 @Composable
-fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM: DashboardViewModel){
+fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM: DashboardViewModel, listaAmigosViewModel: ListaAmigosViewModel){
+
+
+
     Scaffold(
         topBar = {
             TopBarDashboard(navController, loginVM, dashboardVM)
@@ -53,15 +63,18 @@ fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM:
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BodyDashboard(navController, dashboardVM)
+            BodyDashboard(navController, dashboardVM, listaAmigosViewModel, loginVM)
         }
     }
+
+
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashboardVM: DashboardViewModel){
+
     val contexto = LocalContext.current
     val isLoading by dashboardVM.isLoading.collectAsState()
     var mostrarMenuPuntos by remember { mutableStateOf(false) }
@@ -79,7 +92,7 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text("Dashboard")
+            Text("BIENVENIDO: "+dashboardVM.getUsuario().nombre + " " + dashboardVM.getUsuario().apellidos)
         },
         actions = {
             IconButton(
@@ -121,7 +134,7 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
                     }
                 },
                 onDismiss = { mostrarMenuPuntos = false },
-                esAdministrador = { if (usuario!!.rol == "Administrador") true else false }
+                esAdministrador = { usuario.rol == "Administrador" }
             )
         }
     )
@@ -169,15 +182,39 @@ fun DesplegarMenuPuntos(expanded: Boolean, opciones: List<String>, onItemClick: 
 }
 
 @Composable
-fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel){
+fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel, listaAmigosViewModel: ListaAmigosViewModel, loginViewModel: LoginViewModel){
     val isLoading by dashboardVM.isLoading.collectAsState()
     val numUsuariosConectados by dashboardVM.numUsuariosConectados.collectAsState()
+    val msgObtenidos by dashboardVM.msgObtenidos.collectAsState()
+    val contexto = LocalContext.current
+    val notificacionEnviada by dashboardVM.notificacionEnviada.collectAsState()
+    val usuario by dashboardVM.usuario.collectAsState()
+
+    if(usuario.correo.isNotEmpty()){
+        LaunchedEffect(Unit) {
+            Log.i(Constantes.TAG,"Obteniendo mensajes no leídos...")
+
+            dashboardVM.obtenerMensajesNoLeidos()
+        }
+    }
+
+
+    LaunchedEffect(msgObtenidos) {
+        if (msgObtenidos && !notificacionEnviada) {
+            Log.i(Constantes.TAG, "Enviando notificación...")
+            dashboardVM.sendNotification(contexto)
+        }
+    }
+
+    LaunchedEffect(notificacionEnviada) {
+        dashboardVM.setMsgObtenidos(false)
+    }
 
     Column (modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
         if (isLoading){
             Text(text = "Cargando usuarios conectados...")
         }else{
-            Text(text = "Usuarios conectados: "+numUsuariosConectados)
+            Text(text = "Usuarios conectados: $numUsuariosConectados")
         }
     }
     Column(
@@ -202,8 +239,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Rutas.amigos) {
-                popUpTo(Rutas.dashboard) { inclusive = false }
+            onClick = {
+                listaAmigosViewModel.cargarUsuarios(loginViewModel.getCurrentEmail())
+                navController.navigate(Rutas.amigos) {popUpTo(Rutas.dashboard) { inclusive = false }
             }},
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier

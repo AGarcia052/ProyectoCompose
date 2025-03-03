@@ -5,5 +5,6 @@ data class Quedada(
     val correosUsr: List<String> = emptyList(),
     val fecha: String = "",
     val ubicacion: String = "",
-    val inscripcion: Boolean = false
+    val inscripcion: Boolean = false,
+    val llegadas: List<Llegada> = emptyList()
 )

@@ -3,8 +3,8 @@ package com.example.proyectocompose.login
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
-import com.example.proyectocompose.Constantes
+import com.example.proyectocompose.utils.Colecciones
+import com.example.proyectocompose.utils.Constantes
 import com.example.proyectocompose.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -186,7 +186,7 @@ class LoginViewModel: ViewModel() {
     }
 
     private fun checkForm(){
-
+        Log.e(Constantes.TAG, "LOGINVW: CHECKFORM")
         var formCompletado:Boolean
         var activo:Boolean?
         db.collection(Colecciones.usuarios)
@@ -196,7 +196,7 @@ class LoginViewModel: ViewModel() {
                 val datos = result.data
                 datos?.let {
                     formCompletado = datos["formCompletado"] as Boolean
-                    activo = datos["activado"] as Boolean?
+                    activo = datos["activo"] as Boolean?
                     Log.e(Constantes.TAG, "LOGINVW: FORM COMPLETADO: $formCompletado")
                     if (formCompletado){
                         if(activo != null){

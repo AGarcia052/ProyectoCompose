@@ -2,9 +2,8 @@ package com.example.proyectocompose.usuario.chat
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.proyectocompose.Colecciones
-import com.example.proyectocompose.Constantes.TAG
-import com.example.proyectocompose.model.Amigo
+import com.example.proyectocompose.utils.Colecciones
+import com.example.proyectocompose.utils.Constantes.TAG
 import com.example.proyectocompose.model.Mensaje
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -28,10 +27,12 @@ class ChatViewModel: ViewModel() {
 
                     for (mensajeSnapshot in snapshot.children) {
                         val mensaje = mensajeSnapshot.getValue(Mensaje::class.java)
-
                         if (mensaje != null && ((mensaje.sender == usuario1 && mensaje.reciever == usuario2) ||
                                     (mensaje.sender == usuario2 && mensaje.reciever == usuario1))) {
                             mensajesList.add(mensaje)
+                            if (mensaje.sender == usuario1 && mensaje.reciever == usuario2 && !mensaje.leido){
+                                leerMensaje(mensajeSnapshot.key!!)
+                            }
                         }
                     }
 
@@ -57,5 +58,12 @@ class ChatViewModel: ViewModel() {
                 }
         }
     }
+
+    private fun leerMensaje(mensajeId: String) {
+        Log.d(TAG, "Leyendo mensaje con ID: $mensajeId")
+        databaseReference.child(mensajeId).child("leido").setValue(true)
+
+    }
+
 
 }

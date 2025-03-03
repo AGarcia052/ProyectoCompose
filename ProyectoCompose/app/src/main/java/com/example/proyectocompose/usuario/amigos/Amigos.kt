@@ -2,14 +2,11 @@ package com.example.proyectocompose.usuario.amigos
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,14 +44,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.proyectocompose.R
-import com.example.proyectocompose.Rutas
-import com.example.proyectocompose.administrador.listaUsuarios.ListaUsuariosViewModel
+import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.model.Amigo
-import com.example.proyectocompose.model.User
+import com.example.proyectocompose.usuario.chat.ChatViewModel
 
 @Composable
-fun ListaAmigos(navController: NavController, loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel){
+fun ListaAmigos(navController: NavController, loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel, chatViewModel: ChatViewModel){
     Scaffold(
         topBar = {
             TopBarListaAmigos(navController, loginViewModel,listaAmigosViewModel)
@@ -63,7 +59,7 @@ fun ListaAmigos(navController: NavController, loginViewModel: LoginViewModel, li
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BodyListaAmigos(navController, loginViewModel, listaAmigosViewModel)
+            BodyListaAmigos(navController, loginViewModel, listaAmigosViewModel, chatViewModel)
         }
     }
 }
@@ -109,7 +105,7 @@ fun TopBarListaAmigos(navController: NavController, loginViewModel: LoginViewMod
 
 
 @Composable
-fun BodyListaAmigos(navController: NavController,loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel){
+fun BodyListaAmigos(navController: NavController,loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel, chatViewModel: ChatViewModel){
     val usuarios by listaAmigosViewModel.usuarios.collectAsState()
     LaunchedEffect (usuarios){
         if (usuarios.isEmpty()){
@@ -128,6 +124,7 @@ fun BodyListaAmigos(navController: NavController,loginViewModel: LoginViewModel,
                 ItemUsuario(usuario){
                     listaAmigosViewModel.seleccionarUsuario(it)
                     navController.navigate(Rutas.chat){
+                        chatViewModel.observeMessages(it.correo, loginViewModel.getCurrentEmail())
                         popUpTo(Rutas.amigos) { inclusive = false }
                     }
                 }

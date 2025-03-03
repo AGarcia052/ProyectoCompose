@@ -1,9 +1,16 @@
 package com.example.proyectocompose
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -24,12 +31,19 @@ import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQu
 import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
 import com.example.proyectocompose.usuario.amigos.ListaAmigos
 import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
+import com.example.proyectocompose.usuario.buscarAfines.UsuariosAfines
+import com.example.proyectocompose.usuario.buscarAfines.UsuariosAfinesViewModel
 import com.example.proyectocompose.usuario.chat.Chat
 import com.example.proyectocompose.usuario.chat.ChatViewModel
 import com.example.proyectocompose.usuario.dashboard.Dashboard
 import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 import com.example.proyectocompose.usuario.dashboard.perfil.Perfil
 import com.example.proyectocompose.usuario.dashboard.perfil.PerfilViewModel
+import com.example.proyectocompose.usuario.dashboard.perfil.listaLikes.ListaLikes
+import com.example.proyectocompose.usuario.dashboard.perfil.listaLikes.ListaLikesViewModel
+import com.example.proyectocompose.usuario.quedadas.DatosQuedada
+import com.example.proyectocompose.usuario.quedadas.QuedadasUsuario
+import com.example.proyectocompose.utils.Rutas
 
 class MainActivity : ComponentActivity() {
     val loginViewModel = LoginViewModel()
@@ -40,18 +54,40 @@ class MainActivity : ComponentActivity() {
     val perfilViewModel = PerfilViewModel()
     val quedadasAdminViewModel = QuedadasAdminViewModel()
     val mapsAdminQuedadaViewModel = MapsAdminQuedadaViewModel()
+    val usuariosAfinesViewModel = UsuariosAfinesViewModel()
+    val likesViewModel = ListaLikesViewModel()
+    companion object {
+        const val CHANNEL_ID = "sinLeerChannel"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ProyectoComposeTheme {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            android.Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        ActivityCompat.requestPermissions(
+                            this,
+                            arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                            1
+                        )
+                    }
+                }
+                createNotificationChannel()
+
+
                 val navController = rememberNavController()
 
                 NavHost(navController, startDestination = Rutas.login){
 
                     composable(Rutas.login) {
-                        Login(navController = navController, loginViewModel = loginViewModel)
+                        Login(navController = navController, loginViewModel = loginViewModel, dashboardVM = dashboardViewModel)
                     }
                     composable(Rutas.formulario) {
                         Formulario(navController = navController,loginViewModel= loginViewModel)
@@ -61,7 +97,7 @@ class MainActivity : ComponentActivity() {
                         UsuarioNoActivo(navController)
                     }
                     composable(Rutas.dashboard) {
-                        Dashboard(navController, loginViewModel, dashboardViewModel)
+                        Dashboard(navController, loginViewModel, dashboardViewModel, listaAmigosViewModel)
                     }
                     composable(Rutas.adminPrincipal) {
                         AdminPrincipal(navController, loginViewModel)
@@ -77,7 +113,7 @@ class MainActivity : ComponentActivity() {
                        Perfil(navController = navController, dashboardViewModel = dashboardViewModel, perfilViewModel = perfilViewModel)
                     }
                     composable(Rutas.quedadasAdmin){
-                        QuedadasAdmin(navController = navController, viewModel = quedadasAdminViewModel)
+                        QuedadasAdmin(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
                     }
                     composable(Rutas.addQuedada){
                         AniadirQuedada(navController = navController, viewModel = quedadasAdminViewModel)
@@ -86,10 +122,22 @@ class MainActivity : ComponentActivity() {
                         EditarQuedada(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
                     }
                     composable(Rutas.amigos){
-                        ListaAmigos(navController = navController, loginViewModel = loginViewModel, listaAmigosViewModel = listaAmigosViewModel)
+                        ListaAmigos(navController = navController, loginViewModel = loginViewModel, listaAmigosViewModel = listaAmigosViewModel, chatViewModel = chatViewModel)
                     }
                     composable(Rutas.chat) {
                         Chat(navController = navController,loginViewModel = loginViewModel,listaAmigosViewModel = listaAmigosViewModel,chatViewModel = chatViewModel)
+                    }
+                    composable(Rutas.usuariosAfines){
+                        UsuariosAfines(viewModel = usuariosAfinesViewModel, navController = navController, dashboardViewModel = dashboardViewModel)
+                    }
+                    composable(Rutas.likesUsuario){
+                        ListaLikes(viewModel = likesViewModel, dashboardViewModel = dashboardViewModel, navController)
+                    }
+                    composable(Rutas.quedadasUsuario) {
+                        QuedadasUsuario(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
+                    }
+                    composable(Rutas.datosQuedada) {
+                        DatosQuedada(navController = navController, viewModel = quedadasAdminViewModel, loginViewModel = loginViewModel, mapsViewModel = mapsAdminQuedadaViewModel, dashboardViewModel = dashboardViewModel)
                     }
                 }
             }
@@ -110,6 +158,20 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         loginViewModel.cambiarConectado(true)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Notificaciones"
+            val descriptionText = "Canal para notificaciones de la app"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(MainActivity.CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 }
 
