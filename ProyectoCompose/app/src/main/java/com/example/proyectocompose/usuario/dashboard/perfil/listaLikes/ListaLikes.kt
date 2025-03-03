@@ -60,7 +60,7 @@ fun ListaLikes(
     if (!userCargado.value && usuario.correo.isNotEmpty()) {
 
         viewModel.getUsuariosLike()
-        userCargado.value = false
+        userCargado.value = true
 
     }
 
