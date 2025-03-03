@@ -117,12 +117,23 @@ class QuedadasAdminViewModel : ViewModel() {
                         val fechaEvento = document.getString("fechaEvento") ?: ""
                         val correosUsr = document.get("usuarios") as? List<String> ?: emptyList()
                         val nombre = document.getString("nombre") as String ?: ""
+                        val llegadasHash = document.get("llegadas") as? List<HashMap<*, *>> ?: emptyList()
+                        val llegadas = mutableListOf<Llegada>()
+                        for (llegada in llegadasHash) {
+                            val correo = llegada["correo"] as String
+                            val nombre = llegada["nombre"] as String
+                            val hora = llegada["horaLlegada"] as String
+                            val ubicacion = llegada["ubicacion"] as String
+                            var llegadaAdd = Llegada(correo, nombre, hora, ubicacion)
+                            llegadas.add(llegadaAdd)
+                        }
                         Quedada(
                             nombre = nombre,
                             correosUsr = correosUsr,
                             fecha = fechaEvento,
                             ubicacion = ubicacion,
-                            inscripcion = inscripcionAbierta
+                            inscripcion = inscripcionAbierta,
+                            llegadas = llegadas.toList()
                         )
                     } catch (e: Exception) {
                         Log.e(

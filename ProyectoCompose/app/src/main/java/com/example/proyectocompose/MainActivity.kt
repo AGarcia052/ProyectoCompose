@@ -128,10 +128,7 @@ class MainActivity : ComponentActivity() {
                         Chat(navController = navController,loginViewModel = loginViewModel,listaAmigosViewModel = listaAmigosViewModel,chatViewModel = chatViewModel)
                     }
                     composable(Rutas.usuariosAfines){
-                        UsuariosAfines(
-                            viewModel = usuariosAfinesViewModel, navController = navController,
-                            dashboardViewModel = dashboardViewModel
-                        )
+                        UsuariosAfines(viewModel = usuariosAfinesViewModel, navController = navController, dashboardViewModel = dashboardViewModel)
                     }
                     composable(Rutas.likesUsuario){
                         ListaLikes(viewModel = likesViewModel, dashboardViewModel = dashboardViewModel, navController)
@@ -140,10 +137,7 @@ class MainActivity : ComponentActivity() {
                         QuedadasUsuario(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
                     }
                     composable(Rutas.datosQuedada) {
-                        DatosQuedada(navController = navController, viewModel = quedadasAdminViewModel, loginViewModel = loginViewModel)
-                    }
-                    composable(Rutas.anunciarLlegada) {
-
+                        DatosQuedada(navController = navController, viewModel = quedadasAdminViewModel, loginViewModel = loginViewModel, mapsViewModel = mapsAdminQuedadaViewModel, dashboardViewModel = dashboardViewModel)
                     }
                 }
             }

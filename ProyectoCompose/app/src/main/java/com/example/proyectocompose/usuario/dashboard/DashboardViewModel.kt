@@ -44,6 +44,10 @@ class DashboardViewModel:ViewModel() {
     private val _usuario = MutableStateFlow<User>(User())
     val usuario: StateFlow<User> get() = _usuario
 
+    fun getUsuario():User{
+        return _usuario.value
+    }
+
     private val _msgObtenidos = MutableStateFlow<Boolean>(false)
     val msgObtenidos: StateFlow<Boolean> get()=_msgObtenidos
 

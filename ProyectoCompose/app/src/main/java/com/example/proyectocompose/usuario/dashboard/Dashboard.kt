@@ -47,6 +47,8 @@ import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
 import com.example.proyectocompose.utils.Constantes
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM: DashboardViewModel, listaAmigosViewModel: ListaAmigosViewModel){
@@ -72,6 +74,7 @@ fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM:
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashboardVM: DashboardViewModel){
+
     val contexto = LocalContext.current
     val isLoading by dashboardVM.isLoading.collectAsState()
     var mostrarMenuPuntos by remember { mutableStateOf(false) }
@@ -89,7 +92,7 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text("Dashboard")
+            Text("BIENVENIDO: "+dashboardVM.getUsuario().nombre + " " + dashboardVM.getUsuario().apellidos)
         },
         actions = {
             IconButton(

@@ -1,21 +1,16 @@
 package com.example.proyectocompose.usuario.quedadas
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -27,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
@@ -45,14 +39,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.proyectocompose.administrador.quedadas.componentes.SeleccionarFecha
 import com.example.proyectocompose.administrador.quedadas.componentes.SeleccionarUbicacion
 import com.example.proyectocompose.administrador.quedadas.viewModels.MapsAdminQuedadaViewModel
 import com.example.proyectocompose.administrador.quedadas.viewModels.QuedadasAdminViewModel
 import com.example.proyectocompose.common.BodyText
 import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.model.Llegada
+import com.example.proyectocompose.model.User
 import com.example.proyectocompose.model.UserQuedada
+import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 import com.example.proyectocompose.utils.Rutas
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -62,7 +57,9 @@ import java.time.format.DateTimeFormatter
 fun DatosQuedada(
     navController: NavController,
     viewModel: QuedadasAdminViewModel,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    mapsViewModel: MapsAdminQuedadaViewModel,
+    dashboardViewModel: DashboardViewModel
 ) {
 
     Scaffold(
@@ -73,7 +70,7 @@ fun DatosQuedada(
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            DatosQuedadaBody(viewModel,navController, loginViewModel)
+            DatosQuedadaBody(viewModel,navController, loginViewModel, mapsViewModel, dashboardViewModel)
         }
     }
 
@@ -114,8 +111,11 @@ fun TopBarDatosQuedada(navController: NavController, quedadaViewModel: QuedadasA
 fun DatosQuedadaBody(
     viewModel: QuedadasAdminViewModel,
     navController: NavController,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    mapsViewModel: MapsAdminQuedadaViewModel,
+    dashboardViewModel: DashboardViewModel
 ) {
+    val showSeleccUbicacion = remember { mutableStateOf(false) }
     val quedadaSelecc by viewModel.quedadaSelecc.collectAsState()
     val usuariosObtenidos by viewModel.usuariosObtenidos.collectAsState()
     val quedadaModificada by viewModel.quedadaModificada.collectAsState()
@@ -178,11 +178,20 @@ fun DatosQuedadaBody(
                     && quedadaSelecc.llegadas.none { it.correo == loginViewModel.getCurrentEmail() }){
                     Button(
                         onClick = {
-                            navController.navigate(Rutas.anunciarLlegada)
+                            showSeleccUbicacion.value = true
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         BodyText(text = "Anunciar llegada")
+                    }
+                    if (showSeleccUbicacion.value) {
+                        AnunciarLlegada(
+                            viewModel = mapsViewModel,
+                            quedadaViewModel = viewModel,
+                            navController = navController,
+                            dashboardViewModel = dashboardViewModel,
+                            onDismissRequest = {showSeleccUbicacion.value = false}
+                        )
                     }
                 }
 
