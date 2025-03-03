@@ -49,7 +49,7 @@ class ListaLikesViewModel: ViewModel() {
      * _usuariosObtenidos sea true solo si se han intentado obtener todos los usuarios
      * **/
     fun getUsuariosLike(){
-
+        _usuariosLike.value = mutableListOf()
         fun verificarFinalizacion() {
             consultasPendientes--
             if (consultasPendientes <= 0) {

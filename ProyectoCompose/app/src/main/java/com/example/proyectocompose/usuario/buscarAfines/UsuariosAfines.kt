@@ -91,7 +91,10 @@ fun UsuariosAfines(viewModel: UsuariosAfinesViewModel, navController: NavControl
     Scaffold(
         topBar = {TopAppBarUsrAfines(navController)}, bottomBar = {BottomAppBar {
             Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()){
-                Button(onClick = {viewModel.like(candidato.correo)}, enabled = btnActivos) { Text(text = "Like") }
+                Button(onClick = {
+                    viewModel.like(candidato.correo)
+                    dashboardViewModel.setUsuarioLike(candidato.correo)
+                                 }, enabled = btnActivos) { Text(text = "Like") }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = {viewModel.descartar(candidato.correo)},enabled = btnActivos){ Text(text = "Descartar") }
             }

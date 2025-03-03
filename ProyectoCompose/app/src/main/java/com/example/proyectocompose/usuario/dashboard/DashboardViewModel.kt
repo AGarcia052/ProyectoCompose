@@ -227,4 +227,9 @@ class DashboardViewModel:ViewModel() {
         _notificacionEnviada.value = value
     }
 
+    fun setUsuarioLike(correo:String){
+        _usuario.value.usuariosConLike += correo
+    }
+
+
 }
