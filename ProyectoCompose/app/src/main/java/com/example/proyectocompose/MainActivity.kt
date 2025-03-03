@@ -122,7 +122,7 @@ class MainActivity : ComponentActivity() {
                         EditarQuedada(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
                     }
                     composable(Rutas.amigos){
-                        ListaAmigos(navController = navController, loginViewModel = loginViewModel, listaAmigosViewModel = listaAmigosViewModel)
+                        ListaAmigos(navController = navController, loginViewModel = loginViewModel, listaAmigosViewModel = listaAmigosViewModel, chatViewModel = chatViewModel)
                     }
                     composable(Rutas.chat) {
                         Chat(navController = navController,loginViewModel = loginViewModel,listaAmigosViewModel = listaAmigosViewModel,chatViewModel = chatViewModel)

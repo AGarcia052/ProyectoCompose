@@ -47,9 +47,10 @@ import com.example.proyectocompose.R
 import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.model.Amigo
+import com.example.proyectocompose.usuario.chat.ChatViewModel
 
 @Composable
-fun ListaAmigos(navController: NavController, loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel){
+fun ListaAmigos(navController: NavController, loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel, chatViewModel: ChatViewModel){
     Scaffold(
         topBar = {
             TopBarListaAmigos(navController, loginViewModel,listaAmigosViewModel)
@@ -58,7 +59,7 @@ fun ListaAmigos(navController: NavController, loginViewModel: LoginViewModel, li
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BodyListaAmigos(navController, loginViewModel, listaAmigosViewModel)
+            BodyListaAmigos(navController, loginViewModel, listaAmigosViewModel, chatViewModel)
         }
     }
 }
@@ -104,7 +105,7 @@ fun TopBarListaAmigos(navController: NavController, loginViewModel: LoginViewMod
 
 
 @Composable
-fun BodyListaAmigos(navController: NavController,loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel){
+fun BodyListaAmigos(navController: NavController,loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel, chatViewModel: ChatViewModel){
     val usuarios by listaAmigosViewModel.usuarios.collectAsState()
     LaunchedEffect (usuarios){
         if (usuarios.isEmpty()){
@@ -123,6 +124,7 @@ fun BodyListaAmigos(navController: NavController,loginViewModel: LoginViewModel,
                 ItemUsuario(usuario){
                     listaAmigosViewModel.seleccionarUsuario(it)
                     navController.navigate(Rutas.chat){
+                        chatViewModel.observeMessages(it.correo, loginViewModel.getCurrentEmail())
                         popUpTo(Rutas.amigos) { inclusive = false }
                     }
                 }
