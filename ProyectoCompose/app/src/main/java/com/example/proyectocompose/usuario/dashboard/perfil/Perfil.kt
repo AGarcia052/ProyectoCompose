@@ -423,27 +423,26 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
             ) {
 
                 Button(onClick = {
-                    perfilViewModel.actualizarUsuario(
-                        User(
-                            nombre = nombre.value,
-                            apellidos = apellidos.value,
-                            activo = true,
-                            conectado = true,
-                            correo = usuario.value.correo,
-                            fecNac = fecnac.value,
-                            formCompletado = true,
-                            rol = usuario.value.rol,
-                            formulario = Formulario(
-                                relacionSeria = relacionSeria.value,
-                                deportes = deportes.intValue,
-                                interesSexual = interesSexual.value,
-                                politica = politica.intValue,
-                                quiereHijos = quiereHijos.value,
-                                tieneHijos = tieneHijos.value,
-                                arte = arte.intValue
-                            )
+                    var usuarioModificado = User(
+                        nombre = nombre.value,
+                        apellidos = apellidos.value,
+                        activo = true,
+                        conectado = true,
+                        correo = usuario.value.correo,
+                        fecNac = fecnac.value,
+                        formCompletado = true,
+                        rol = usuario.value.rol,
+                        formulario = Formulario(
+                            relacionSeria = relacionSeria.value,
+                            deportes = deportes.intValue,
+                            interesSexual = interesSexual.value,
+                            politica = politica.intValue,
+                            quiereHijos = quiereHijos.value,
+                            tieneHijos = tieneHijos.value,
+                            arte = arte.intValue
                         )
                     )
+                    perfilViewModel.actualizarUsuario(usuarioModificado)
                 }, enabled = haModificado.value) {
                     Text(text = "Guardar cambios")
                 }
@@ -482,6 +481,7 @@ fun BodyProfile(viewModel: DashboardViewModel, navController: NavController, per
 
             if (usuarioMod) {
                 navController.navigate(Rutas.dashboard) {
+                    viewModel.cargarUsuario(usuario.value.correo)
                     popUpTo(Rutas.dashboard) { inclusive = false }
                 }
                 perfilViewModel.setUsuarioMod(false)

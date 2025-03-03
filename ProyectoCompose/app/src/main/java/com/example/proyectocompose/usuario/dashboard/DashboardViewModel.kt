@@ -231,5 +231,9 @@ class DashboardViewModel:ViewModel() {
         _usuario.value.usuariosConLike += correo
     }
 
+    fun setUsuario(usuario:User){
+        _usuario.value = usuario
+    }
+
 
 }
