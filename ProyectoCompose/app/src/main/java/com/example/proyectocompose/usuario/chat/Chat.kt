@@ -42,12 +42,13 @@ import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
 import com.example.proyectocompose.model.Mensaje
 import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
+import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 
 @Composable
 fun Chat(navController: NavController, loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel, chatViewModel: ChatViewModel){
     Scaffold(
         topBar = {
-            TopBarChat(navController,listaAmigosViewModel)
+            TopBarChat(navController,listaAmigosViewModel, loginViewModel)
         }) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
@@ -60,7 +61,7 @@ fun Chat(navController: NavController, loginViewModel: LoginViewModel, listaAmig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosViewModel){
+fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosViewModel, loginViewModel: LoginViewModel){
     val usuarioSeleccionado by listaAmigosViewModel.usuarioSeleccionado.collectAsState()
     TopAppBar(
         colors = topAppBarColors(
@@ -78,6 +79,7 @@ fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosVi
         navigationIcon = {
             IconButton(
                 onClick = {
+                    listaAmigosViewModel.cargarUsuarios(loginViewModel.getCurrentEmail())
                     navController.popBackStack(Rutas.amigos, inclusive = false)
                 }
             ) {

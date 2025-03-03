@@ -41,6 +41,8 @@ import com.example.proyectocompose.usuario.dashboard.perfil.Perfil
 import com.example.proyectocompose.usuario.dashboard.perfil.PerfilViewModel
 import com.example.proyectocompose.usuario.dashboard.perfil.listaLikes.ListaLikes
 import com.example.proyectocompose.usuario.dashboard.perfil.listaLikes.ListaLikesViewModel
+import com.example.proyectocompose.usuario.quedadas.DatosQuedada
+import com.example.proyectocompose.usuario.quedadas.QuedadasUsuario
 import com.example.proyectocompose.utils.Rutas
 
 class MainActivity : ComponentActivity() {
@@ -85,7 +87,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController, startDestination = Rutas.login){
 
                     composable(Rutas.login) {
-                        Login(navController = navController, loginViewModel = loginViewModel)
+                        Login(navController = navController, loginViewModel = loginViewModel, dashboardVM = dashboardViewModel)
                     }
                     composable(Rutas.formulario) {
                         Formulario(navController = navController,loginViewModel= loginViewModel)
@@ -95,7 +97,7 @@ class MainActivity : ComponentActivity() {
                         UsuarioNoActivo(navController)
                     }
                     composable(Rutas.dashboard) {
-                        Dashboard(navController, loginViewModel, dashboardViewModel)
+                        Dashboard(navController, loginViewModel, dashboardViewModel, listaAmigosViewModel)
                     }
                     composable(Rutas.adminPrincipal) {
                         AdminPrincipal(navController, loginViewModel)
@@ -126,13 +128,16 @@ class MainActivity : ComponentActivity() {
                         Chat(navController = navController,loginViewModel = loginViewModel,listaAmigosViewModel = listaAmigosViewModel,chatViewModel = chatViewModel)
                     }
                     composable(Rutas.usuariosAfines){
-                        UsuariosAfines(
-                            viewModel = usuariosAfinesViewModel, navController = navController,
-                            dashboardViewModel = dashboardViewModel
-                        )
+                        UsuariosAfines(viewModel = usuariosAfinesViewModel, navController = navController, dashboardViewModel = dashboardViewModel)
                     }
                     composable(Rutas.likesUsuario){
                         ListaLikes(viewModel = likesViewModel, dashboardViewModel = dashboardViewModel, navController)
+                    }
+                    composable(Rutas.quedadasUsuario) {
+                        QuedadasUsuario(navController = navController, viewModel = quedadasAdminViewModel, mapsViewModel = mapsAdminQuedadaViewModel)
+                    }
+                    composable(Rutas.datosQuedada) {
+                        DatosQuedada(navController = navController, viewModel = quedadasAdminViewModel, loginViewModel = loginViewModel, mapsViewModel = mapsAdminQuedadaViewModel, dashboardViewModel = dashboardViewModel)
                     }
                 }
             }

@@ -45,10 +45,13 @@ import com.example.proyectocompose.MainActivity
 import com.example.proyectocompose.R
 import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
+import com.example.proyectocompose.usuario.amigos.ListaAmigosViewModel
 import com.example.proyectocompose.utils.Constantes
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM: DashboardViewModel){
+fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM: DashboardViewModel, listaAmigosViewModel: ListaAmigosViewModel){
 
 
 
@@ -60,7 +63,7 @@ fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM:
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            BodyDashboard(navController, dashboardVM)
+            BodyDashboard(navController, dashboardVM, listaAmigosViewModel, loginVM)
         }
     }
 
@@ -71,6 +74,7 @@ fun Dashboard(navController: NavController,loginVM: LoginViewModel, dashboardVM:
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashboardVM: DashboardViewModel){
+
     val contexto = LocalContext.current
     val isLoading by dashboardVM.isLoading.collectAsState()
     var mostrarMenuPuntos by remember { mutableStateOf(false) }
@@ -88,7 +92,7 @@ fun TopBarDashboard(navController: NavController, loginVM: LoginViewModel, dashb
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text("Dashboard")
+            Text("BIENVENIDO: "+dashboardVM.getUsuario().nombre + " " + dashboardVM.getUsuario().apellidos)
         },
         actions = {
             IconButton(
@@ -178,7 +182,7 @@ fun DesplegarMenuPuntos(expanded: Boolean, opciones: List<String>, onItemClick: 
 }
 
 @Composable
-fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel){
+fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel, listaAmigosViewModel: ListaAmigosViewModel, loginViewModel: LoginViewModel){
     val isLoading by dashboardVM.isLoading.collectAsState()
     val numUsuariosConectados by dashboardVM.numUsuariosConectados.collectAsState()
     val msgObtenidos by dashboardVM.msgObtenidos.collectAsState()
@@ -235,8 +239,9 @@ fun BodyDashboard(navController: NavController, dashboardVM: DashboardViewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Rutas.amigos) {
-                popUpTo(Rutas.dashboard) { inclusive = false }
+            onClick = {
+                listaAmigosViewModel.cargarUsuarios(loginViewModel.getCurrentEmail())
+                navController.navigate(Rutas.amigos) {popUpTo(Rutas.dashboard) { inclusive = false }
             }},
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier

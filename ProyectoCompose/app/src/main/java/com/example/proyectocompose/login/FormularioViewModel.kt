@@ -75,7 +75,7 @@ class FormularioViewModel: ViewModel(){
             "descripcion" to descripcion.value,
             "correo" to correo.value,
             "formCompletado" to true,
-            "rol" to "USUARIO",
+            "rol" to "Usuario",
             "activo" to false,
             "conectado" to false,
             "formulario" to form,

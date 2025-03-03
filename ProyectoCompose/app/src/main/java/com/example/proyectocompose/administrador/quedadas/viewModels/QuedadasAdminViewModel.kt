@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import com.example.proyectocompose.model.Llegada
 import com.example.proyectocompose.utils.Colecciones
 import com.example.proyectocompose.utils.Constantes
 import com.example.proyectocompose.model.Quedada
@@ -47,6 +48,7 @@ class QuedadasAdminViewModel : ViewModel() {
 
     private val _usuariosObtenidos = MutableStateFlow<Boolean>(false)
     val usuariosObtenidos: StateFlow<Boolean> get() = _usuariosObtenidos
+
 
     fun restart() {
         _usuariosObtenidos.value = false
@@ -102,6 +104,7 @@ class QuedadasAdminViewModel : ViewModel() {
             }
     }
 
+
     fun getQuedadas() {
         _isLoading.value = true
         db.collection(Colecciones.quedadas)
@@ -114,12 +117,23 @@ class QuedadasAdminViewModel : ViewModel() {
                         val fechaEvento = document.getString("fechaEvento") ?: ""
                         val correosUsr = document.get("usuarios") as? List<String> ?: emptyList()
                         val nombre = document.getString("nombre") as String ?: ""
+                        val llegadasHash = document.get("llegadas") as? List<HashMap<*, *>> ?: emptyList()
+                        val llegadas = mutableListOf<Llegada>()
+                        for (llegada in llegadasHash) {
+                            val correo = llegada["correo"] as String
+                            val nombre = llegada["nombre"] as String
+                            val hora = llegada["horaLlegada"] as String
+                            val ubicacion = llegada["ubicacion"] as String
+                            var llegadaAdd = Llegada(correo, nombre, hora, ubicacion)
+                            llegadas.add(llegadaAdd)
+                        }
                         Quedada(
                             nombre = nombre,
                             correosUsr = correosUsr,
                             fecha = fechaEvento,
                             ubicacion = ubicacion,
-                            inscripcion = inscripcionAbierta
+                            inscripcion = inscripcionAbierta,
+                            llegadas = llegadas.toList()
                         )
                     } catch (e: Exception) {
                         Log.e(
@@ -285,7 +299,28 @@ class QuedadasAdminViewModel : ViewModel() {
     fun setQuedadaCreada(value: Boolean) {
         _quedadaCreada.value = value
     }
+    fun getQuedadaSelecc():Quedada {
+        return _quedadaSelecc.value
+    }
 
+    fun inscribirse(correo: String) {
+        var usersQuedada = ArrayList<UserQuedada>()
+        val correos = _quedadaSelecc.value.correosUsr.toMutableList()
+        correos.add(correo)
+        for (correo in correos) {
+            usersQuedada.add(UserQuedada("", correo))
+        }
+        updateQuedada(_quedadaSelecc.value.nombre, usersQuedada)
+    }
+    fun desinscribirse(correo: String){
+        var usersQuedada = ArrayList<UserQuedada>()
+        val correos = _quedadaSelecc.value.correosUsr.toMutableList()
+        correos.remove(correo)
+        for (correo in correos) {
+            usersQuedada.add(UserQuedada("", correo))
+        }
+        updateQuedada(_quedadaSelecc.value.nombre, usersQuedada)
+    }
 
     //SETTERS DE QUEDADA SELECCIONADA
 
