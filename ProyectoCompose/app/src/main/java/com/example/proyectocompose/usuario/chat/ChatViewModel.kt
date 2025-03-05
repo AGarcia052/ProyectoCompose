@@ -18,33 +18,44 @@ class ChatViewModel: ViewModel() {
 
     private val databaseReference = FirebaseDatabase.getInstance().getReference(Colecciones.mensajes)
 
-    fun observeMessages(usuario1: String, usuario2: String) {
-        databaseReference
-            .orderByChild("sender")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val mensajesList = mutableListOf<Mensaje>()
+    private var mensajesListener: ValueEventListener? = null
 
-                    for (mensajeSnapshot in snapshot.children) {
-                        val mensaje = mensajeSnapshot.getValue(Mensaje::class.java)
-                        if (mensaje != null && ((mensaje.sender == usuario1 && mensaje.reciever == usuario2) ||
-                                    (mensaje.sender == usuario2 && mensaje.reciever == usuario1))) {
-                            mensajesList.add(mensaje)
-                            if (mensaje.sender == usuario1 && mensaje.reciever == usuario2 && !mensaje.leido){
-                                leerMensaje(mensajeSnapshot.key!!)
-                            }
+    fun observeMessages(usuario1: String, usuario2: String) {
+        mensajesListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val mensajesList = mutableListOf<Mensaje>()
+
+                for (mensajeSnapshot in snapshot.children) {
+                    val mensaje = mensajeSnapshot.getValue(Mensaje::class.java)
+                    if (mensaje != null && ((mensaje.sender == usuario1 && mensaje.reciever == usuario2) ||
+                                (mensaje.sender == usuario2 && mensaje.reciever == usuario1))) {
+                        mensajesList.add(mensaje)
+                        if (mensaje.sender == usuario1 && mensaje.reciever == usuario2 && !mensaje.leido) {
+                            leerMensaje(mensajeSnapshot.key!!)
                         }
                     }
-
-                    mensajesList.sortByDescending { it.fechaYHora }
-                    _mensajes.value = mensajesList.toList()
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e(TAG, "Error al observar mensajes: ${error.message}")
-                }
-            })
+                mensajesList.sortByDescending { it.fechaYHora }
+                _mensajes.value = mensajesList.toList()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Error al observar mensajes: ${error.message}")
+            }
+        }
+
+        databaseReference.orderByChild("sender").addValueEventListener(mensajesListener!!)
     }
+
+    fun detenerObservadorMensajes() {
+        mensajesListener?.let {
+            databaseReference.removeEventListener(it)
+            mensajesListener = null
+            Log.d(TAG, "Observer de mensajes eliminado")
+        }
+    }
+
 
     fun sendMessage(sender: String, receiver: String, text: String) {
         val newMessageId = databaseReference.push().key
