@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.proyectocompose.utils.Rutas
 import com.example.proyectocompose.login.LoginViewModel
@@ -48,7 +49,7 @@ import com.example.proyectocompose.usuario.dashboard.DashboardViewModel
 fun Chat(navController: NavController, loginViewModel: LoginViewModel, listaAmigosViewModel: ListaAmigosViewModel, chatViewModel: ChatViewModel){
     Scaffold(
         topBar = {
-            TopBarChat(navController,listaAmigosViewModel, loginViewModel)
+            TopBarChat(navController,listaAmigosViewModel, loginViewModel, chatViewModel)
         }) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
@@ -61,7 +62,7 @@ fun Chat(navController: NavController, loginViewModel: LoginViewModel, listaAmig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosViewModel, loginViewModel: LoginViewModel){
+fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosViewModel, loginViewModel: LoginViewModel, chatViewModel: ChatViewModel){
     val usuarioSeleccionado by listaAmigosViewModel.usuarioSeleccionado.collectAsState()
     TopAppBar(
         colors = topAppBarColors(
@@ -81,6 +82,7 @@ fun TopBarChat(navController: NavController, listaAmigosViewModel: ListaAmigosVi
                 onClick = {
                     listaAmigosViewModel.cargarUsuarios(loginViewModel.getCurrentEmail())
                     navController.popBackStack(Rutas.amigos, inclusive = false)
+                    chatViewModel.detenerObservadorMensajes()
                 }
             ) {
                 Icon(
